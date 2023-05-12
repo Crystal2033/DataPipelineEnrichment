@@ -100,6 +100,8 @@ class ServiceTest {
 
     private static final Integer UPDATE_INTERVAL_POSTGRESQL_RULE_SECS = 10;
 
+    private static final Long ENRICHMENT_ID = 1L;
+
     @BeforeEach
     void initClientsAndTestEnvironment() {
         dataSource = Optional.ofNullable(dataSource).orElse(createConnectionPool());
@@ -287,7 +289,7 @@ class ServiceTest {
     void testServiceEnrichmentOneRule() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -351,7 +353,7 @@ class ServiceTest {
     void testServiceEnrichmentDefaultValue() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -418,7 +420,7 @@ class ServiceTest {
     void testServiceEnrichmentActualDocument() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -489,7 +491,7 @@ class ServiceTest {
     void testServiceEnrichmentTwoRules() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -497,7 +499,7 @@ class ServiceTest {
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
                     "name",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -569,7 +571,7 @@ class ServiceTest {
     void testServiceEnrichmentActualRule() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -577,7 +579,7 @@ class ServiceTest {
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -650,7 +652,7 @@ class ServiceTest {
     void testServiceEnrichmentUpdateRule() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -691,7 +693,7 @@ class ServiceTest {
 
             clearTable();
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
                     "name",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -885,6 +887,7 @@ class ServiceTest {
                 .withValue("db.password", ConfigValueFactory.fromAnyRef(postgreSQL.getPassword()))
                 .withValue("db.driver", ConfigValueFactory.fromAnyRef(postgreSQL.getDriverClassName()))
                 .withValue("application.updateIntervalSec", ConfigValueFactory.fromAnyRef(UPDATE_INTERVAL_POSTGRESQL_RULE_SECS))
+                .withValue("application.enrichmentId", ConfigValueFactory.fromAnyRef(ENRICHMENT_ID))
                 .withValue("mongo.connectionString", ConfigValueFactory.fromAnyRef(mongoDBContainer.getConnectionString()))
                 .withValue("mongo.database", ConfigValueFactory.fromAnyRef(MONGO_TEST_DB))
                 .withValue("mongo.collection", ConfigValueFactory.fromAnyRef(MONGO_TEST_COLLECTION));
