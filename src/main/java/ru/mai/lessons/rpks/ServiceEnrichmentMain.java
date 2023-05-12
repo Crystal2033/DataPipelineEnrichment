@@ -1,15 +1,21 @@
 package ru.mai.lessons.rpks;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.mai.lessons.rpks.impl.ConfigurationReader;
-import ru.mai.lessons.rpks.impl.ServiceEnrichment;
+import ru.mai.lessons.rpks.impl.ConfigReaderImpl;
+import ru.mai.lessons.rpks.impl.ServiceImpl;
 
 @Slf4j
 public class ServiceEnrichmentMain {
     public static void main(String[] args) {
+//        GenerationTool.generate(
+//                Files.readString(
+//                        Path.of("jooq-config.xml")
+//                )
+//        );
+
         log.info("Start service Enrichment");
-        ConfigReader configReader = new ConfigurationReader();
-        Service service = new ServiceEnrichment(); // ваша реализация service
+        ConfigReader configReader = new ConfigReaderImpl();
+        Service service = new ServiceImpl(); // ваша реализация service
         service.start(configReader.loadConfig());
         log.info("Terminate service Enrichment");
     }

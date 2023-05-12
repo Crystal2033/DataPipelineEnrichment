@@ -39,7 +39,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import org.testcontainers.utility.DockerImageName;
 import rpks.model.TestDataModel;
 import ru.mai.lessons.rpks.Service;
-import ru.mai.lessons.rpks.impl.ServiceEnrichment;
+import ru.mai.lessons.rpks.impl.ServiceImpl;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -80,7 +80,7 @@ class ServiceTest {
 
     private final String tableName = "enrichment_rules";
 
-    private final Service serviceEnrichment = new ServiceEnrichment();
+    private final Service serviceEnrichment = new ServiceImpl();
 
     private MongoClient mongoClient;
 
