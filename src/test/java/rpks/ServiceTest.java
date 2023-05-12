@@ -289,7 +289,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -322,6 +322,15 @@ class ServiceTest {
                 data.setEnrichmentField(testDocument.toJson());
                 return toJson(data);
             }).toList();
+
+            //**************************************
+            for (var valueList : listExpectedJson) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            for (var consumerRecord : consumerRecords) {
+                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
+            }
+            //**************************************
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
