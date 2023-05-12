@@ -289,7 +289,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -353,7 +353,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -420,7 +420,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -491,7 +491,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -571,7 +571,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -579,7 +579,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     2L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -652,7 +652,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     1L,
                     1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
