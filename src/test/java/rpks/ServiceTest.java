@@ -424,7 +424,7 @@ class ServiceTest {
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
-                    MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
+                    MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             Document testDocumentOne = new Document()
