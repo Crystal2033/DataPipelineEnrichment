@@ -11,6 +11,7 @@ import org.bson.Document;
 import org.jooq.tools.json.JSONObject;
 import ru.mai.lessons.rpks.model.Enrichment;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -29,8 +30,13 @@ public class MongoDB {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
             MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
+            ArrayList<Document> documents = mongoCollection.find().into(new ArrayList<>());
+            log.info("++++++ Found documents: {}", documents.size());
+            documents.forEach(doc -> log.info("++++++ Found: {}", doc.toJson()));
+
             Document findDocument = mongoCollection.find(criteria).sort(descending("_id")).first();
             if (findDocument != null) valueEnrichment = findDocument.toJson();
+            log.info("===========---- valueEnrichment: {}", valueEnrichment);
 
             int index = 1;
             if (valueEnrichment != null){

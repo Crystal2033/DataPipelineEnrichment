@@ -100,6 +100,8 @@ class ServiceTest {
 
     private static final Integer UPDATE_INTERVAL_POSTGRESQL_RULE_SECS = 10;
 
+    private static final Long ENRICHMENT_ID = 1L;
+
     @BeforeEach
     void initClientsAndTestEnvironment() {
         dataSource = Optional.ofNullable(dataSource).orElse(createConnectionPool());
@@ -287,7 +289,7 @@ class ServiceTest {
     void testServiceEnrichmentOneRule() {
         try {
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -323,15 +325,6 @@ class ServiceTest {
                 return toJson(data);
             }).toList();
 
-            //**************************************
-            for (var valueList : listExpectedJson) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            for (var consumerRecord : consumerRecords) {
-                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
-            }
-            //**************************************
-
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(consumerRecord.value()));
@@ -360,9 +353,9 @@ class ServiceTest {
     void testServiceEnrichmentDefaultValue() {
         try {
             createAndCheckRuleInPostgreSQL(
+                    ENRICHMENT_ID,
                     1L,
-                    1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -427,9 +420,9 @@ class ServiceTest {
     void testServiceEnrichmentActualDocument() {
         try {
             createAndCheckRuleInPostgreSQL(
+                    ENRICHMENT_ID,
                     1L,
-                    1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -470,6 +463,15 @@ class ServiceTest {
                 return toJson(data);
             }).toList();
 
+            //**************************************
+            for (var valueList : listExpectedJson) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            for (var consumerRecord : consumerRecords) {
+                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
+            }
+            //**************************************
+
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(consumerRecord.value()));
@@ -498,15 +500,15 @@ class ServiceTest {
     void testServiceEnrichmentTwoRules() {
         try {
             createAndCheckRuleInPostgreSQL(
+                    ENRICHMENT_ID,
                     1L,
-                    1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
                     "name",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -578,17 +580,17 @@ class ServiceTest {
     void testServiceEnrichmentActualRule() {
         try {
             createAndCheckRuleInPostgreSQL(
+                    ENRICHMENT_ID,
                     1L,
-                    1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -659,9 +661,9 @@ class ServiceTest {
     void testServiceEnrichmentUpdateRule() {
         try {
             createAndCheckRuleInPostgreSQL(
+                    ENRICHMENT_ID,
                     1L,
-                    1L,
-                    "enrichment_field",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -700,7 +702,7 @@ class ServiceTest {
 
             clearTable();
             createAndCheckRuleInPostgreSQL(
-                    1L,
+                    ENRICHMENT_ID,
                     2L,
                     "name",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
@@ -894,6 +896,7 @@ class ServiceTest {
                 .withValue("db.password", ConfigValueFactory.fromAnyRef(postgreSQL.getPassword()))
                 .withValue("db.driver", ConfigValueFactory.fromAnyRef(postgreSQL.getDriverClassName()))
                 .withValue("application.updateIntervalSec", ConfigValueFactory.fromAnyRef(UPDATE_INTERVAL_POSTGRESQL_RULE_SECS))
+                .withValue("application.enrichmentId", ConfigValueFactory.fromAnyRef(ENRICHMENT_ID))
                 .withValue("mongo.connectionString", ConfigValueFactory.fromAnyRef(mongoDBContainer.getConnectionString()))
                 .withValue("mongo.database", ConfigValueFactory.fromAnyRef(MONGO_TEST_DB))
                 .withValue("mongo.collection", ConfigValueFactory.fromAnyRef(MONGO_TEST_COLLECTION));

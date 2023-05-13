@@ -44,7 +44,7 @@ public class ReaderDB implements DbReader {
                 String fieldValueDefault = (String)result.getValue("field_value_default");
 
                 Rule rule = new Rule(enrichmentId, ruleId, fieldName, fieldNameEnrichment, fieldValue, fieldValueDefault);
-                log.info("=========== Rule: {}", rule);
+                log.info("===== Rule: {}", rule);
                 listRules.add(rule);
             });
         } catch (SQLException ex) {

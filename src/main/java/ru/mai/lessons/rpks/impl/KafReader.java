@@ -34,7 +34,7 @@ import static com.mongodb.client.model.Filters.eq;
 @RequiredArgsConstructor
 public class KafReader implements KafkaReader {
     private final Config config;
-    private final Queue<Enrichment> queue;
+    private final Queue<ArrayList<Enrichment>> queue;
     private boolean isExit;
 
     public void processing() {
@@ -67,13 +67,14 @@ public class KafReader implements KafkaReader {
             while (!isExit) {
                 ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
 
-                Enrichment enrichment = queue.peek();
+                ArrayList<Enrichment> listEnrichments = queue.peek();
+                //Enrichment enrichment = queue.peek();
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                     String jsonString =  consumerRecord.value();
                     if (jsonString.isBlank()) continue;
 
                     Message message = Message.builder().value(jsonString).build();
-                    message = ruleProcess.processing(message, enrichment); // обогащение сообщения
+                    message = ruleProcess.processing(message, listEnrichments); // обогащение сообщения
 
                     kafkaWriter.processing(message);
                 }

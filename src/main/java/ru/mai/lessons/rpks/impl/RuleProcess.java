@@ -23,7 +23,7 @@ import static com.mongodb.client.model.Filters.eq;
 @RequiredArgsConstructor
 public class RuleProcess implements RuleProcessor {
     //private final MongoDB mongoDB;
-    public Message processing(Message message, Enrichment enrichment) throws ParseException {
+    public Message processing(Message message, ArrayList<Enrichment> listEnrichments) throws ParseException {
         log.info("-------- MESSAGE {}", message.getValue());
 
         String jsonString = message.getValue();
@@ -50,39 +50,30 @@ public class RuleProcess implements RuleProcessor {
 //        JSONParser jsonParser = new JSONParser();
 //        JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
 
-        String fieldName = enrichment.getFieldName();              // поле сообщения, которое нужно обогатить
-        String valueEnrichment = enrichment.getValueEnrichment(); // Value обогащения
+        for (Enrichment enrichment : listEnrichments) {
+            String fieldName = enrichment.getFieldName();              // поле сообщения, которое нужно обогатить
+            String valueEnrichment = enrichment.getValueEnrichment(); // Value обогащения
 
-        if (fieldName != null && valueEnrichment != null)
-        {
-            map.put("\"" + fieldName + "\"", valueEnrichment);
-            log.info("+++++++++++ map2 {}", map);
-
-            StringBuilder jsonString2 = new StringBuilder("{");
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                jsonString2.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+            if (fieldName != null && valueEnrichment != null)
+            {
+                map.put("\"" + fieldName + "\"", valueEnrichment);
+                log.info("+++++++++++ map2 {}", map);
             }
-            jsonString2.delete(jsonString2.length() - 1, jsonString2.length());
-            jsonString2.append("}");
-            log.info("=========== jsonString2 {}", jsonString2);
-
-//            jsonObject.remove(fieldName);
-//            jsonObject.put(fieldName, valueEnrichment);
-//            log.info("=========== jsonObject {}", jsonObject);
-//            log.info("=========== jsonString {}", jsonObject.toString());
-
-            message = Message.builder().value(jsonString2.toString()).build();
-            log.info("=========== message {}", message.getValue());
-            return message;
         }
 
+        StringBuilder jsonString2 = new StringBuilder("{");
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            jsonString2.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+        }
+        jsonString2.delete(jsonString2.length() - 1, jsonString2.length());
+        jsonString2.append("}");
+        log.info("=========== jsonString2 {}", jsonString2);
 
-
-
-
-
+        message = Message.builder().value(jsonString2.toString()).build();
+        log.info("=========== message {}", message.getValue());
 
         return message;
+
     }
 
 //    private final ObjectMapper objectMapper = new ObjectMapper();

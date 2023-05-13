@@ -10,6 +10,7 @@ import ru.mai.lessons.rpks.Service;
 import ru.mai.lessons.rpks.model.Enrichment;
 import ru.mai.lessons.rpks.model.Rule;
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -35,14 +36,14 @@ public class ServiceEnrichment implements Service {
         String collection = config.getString("mongo.collection");
         MongoDB mongoDB = new MongoDB();
 
-        Queue<Enrichment> queue = new ConcurrentLinkedQueue<>();
+        Queue<ArrayList<Enrichment>> queue = new ConcurrentLinkedQueue<>();
         final int[] nRules = {1};
         new Thread(() -> {
             try {
                 while(nRules[0] > 0) {
                     //Считываем правила из БД
                     Rule[] rules = dbreader.readRulesFromDB();
-
+                    ArrayList<Enrichment> listEnrichments = new ArrayList<>();
 
                     String fieldName = null;
                     String fieldNameEnrichment = null;
@@ -57,20 +58,17 @@ public class ServiceEnrichment implements Service {
                         fieldValueDefault = rule.getFieldValueDefault();
 
                         criteria.append(fieldNameEnrichment,fieldValue);
+                        String valueDocument = mongoDB.readFromMongoDB(connectionString, database, collection, criteria);
+                        if (valueDocument == null) valueDocument = fieldValueDefault;
+                        log.info("=========== valueDocument: {}", valueDocument);
+
+                        Enrichment enrichment = new Enrichment(fieldName, valueDocument);
+                        listEnrichments.add(enrichment);
                     }
 
-                    String valueDocument = mongoDB.readFromMongoDB(connectionString, database, collection, criteria);
-                    if (valueDocument == null) valueDocument = fieldValueDefault;
-                    log.info("=========== valueDocument: {}", valueDocument);
 
-                    Enrichment enrichment = new Enrichment(fieldName, valueDocument);
                     if(!queue.isEmpty()) queue.remove();
-                    queue.add(enrichment);
-
-
-
-
-
+                    queue.add(listEnrichments);
 
 
 
