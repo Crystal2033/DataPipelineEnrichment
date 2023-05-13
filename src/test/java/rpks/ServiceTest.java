@@ -34,6 +34,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import org.testcontainers.utility.DockerImageName;
@@ -42,6 +43,7 @@ import ru.mai.lessons.rpks.Service;
 import ru.mai.lessons.rpks.impl.ServiceEnrichment;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.*;
@@ -322,12 +324,12 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocument.toJson());
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -386,12 +388,12 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -460,12 +462,12 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -538,13 +540,13 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentOne.toJson());
-                data.setName(testDocumentTwo.toJson());
-                return toJson(data);
+                data.setEnrichmentOtherField(testDocumentTwo.toJson());
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -618,12 +620,12 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -685,7 +687,7 @@ class ServiceTest {
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             log.info("Wait until messages processed");
@@ -718,12 +720,12 @@ class ServiceTest {
 
             var listExpectedJsonAfterUpdated = listDataInAfterUpdateRule.stream().map(data -> {
                 data.setName(testDocumentOne.toJson());
-                return toJson(data);
+                return toJsonNode(toJson(data));
             }).toList();
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
-                assertTrue(listExpectedJson.contains(consumerRecord.value()) || listExpectedJsonAfterUpdated.contains(consumerRecord.value()));
+                assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())) || listExpectedJsonAfterUpdated.contains(toJsonNode(consumerRecord.value())));
             }
 
             serviceIsWork.cancel(true);
@@ -947,5 +949,16 @@ class ServiceTest {
             log.error("Error send message to kafka topic", e);
             fail();
         }
+    }
+
+    private JsonNode toJsonNode(String json) {
+        JsonNode jsonNode = objectMapper.createObjectNode();
+        try {
+            jsonNode = objectMapper.readTree(json);
+        } catch (IOException e) {
+            log.error("Error transformation json string to json node {}", json);
+            fail();
+        }
+        return jsonNode;
     }
 }
