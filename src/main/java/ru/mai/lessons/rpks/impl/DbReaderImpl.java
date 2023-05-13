@@ -18,12 +18,11 @@ public class DbReaderImpl implements DbReader {
     private final HikariDataSource hikariDataSource;
     private final long programId;
 
-    public DbReaderImpl(Config dbConfig) {
+    public DbReaderImpl(Config dbConfig, long programId) {
         String url = dbConfig.getString("jdbcUrl");
         String user = dbConfig.getString("user");
         String password = dbConfig.getString("password");
         String driver = dbConfig.getString("driver");
-        programId = dbConfig.getLong("programId");
 
         HikariConfig dataBaseConfig = new HikariConfig();
         dataBaseConfig.setJdbcUrl(url);
@@ -32,6 +31,7 @@ public class DbReaderImpl implements DbReader {
         dataBaseConfig.setDriverClassName(driver);
 
         this.hikariDataSource = new HikariDataSource(dataBaseConfig);
+        this.programId = programId;
     }
 
     @Override

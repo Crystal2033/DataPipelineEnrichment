@@ -13,6 +13,7 @@ import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -25,18 +26,23 @@ public class KafkaWriterImpl implements KafkaWriter {
     private final String topic;
     private final String bootstrapServers;
 
-    private final KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(
-            Map.of(
-                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                    ProducerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString()
-            ),
-            new StringSerializer(),
-            new StringSerializer()
-    );
+    private KafkaProducer<String, String> kafkaProducer;
 
     @Override
     public void processing(Message message) {
+        initKafkaProducer();
         Message checkedMessage = ruleProcessor.processing(message, rulesGetter.get());
         kafkaProducer.send(new ProducerRecord<>(topic, checkedMessage.getValue()));
+    }
+
+    private void initKafkaProducer() {
+        kafkaProducer = Optional.ofNullable(kafkaProducer).orElse(new KafkaProducer<>(
+                Map.of(
+                        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                        ProducerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString()
+                ),
+                new StringSerializer(),
+                new StringSerializer()
+        ));
     }
 }

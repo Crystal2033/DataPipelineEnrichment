@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.mai.lessons.rpks.*;
 import ru.mai.lessons.rpks.model.Rule;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class ServiceImpl implements Service {
     private static final String DATA_BASE_CONFIG_NAME = "db";
     private static final String KAFKA_CONFIG_NAME = "kafka";
-    private static final String RULE_INTERVAL_CONFIG_NAME = "application";
+    private static final String APPLICATION_CONFIG_NAME = "application";
     private static final String MONGO_CONFIG_NAME = "mongo";
 
     private Rule[] rules;
@@ -27,15 +28,20 @@ public class ServiceImpl implements Service {
     public void start(Config config) {
         MongoDBClient mongoDBClient = new MongoDBClientImpl(config.getConfig(MONGO_CONFIG_NAME));
         ruleProcessor = new RuleProcessorImpl(mongoDBClient);
-        dbReader = new DbReaderImpl(config.getConfig(DATA_BASE_CONFIG_NAME));
 
-        initScheduledExecutorServiceForRuleUpdate(config.getConfig(RULE_INTERVAL_CONFIG_NAME));
+        Config applicationConfig = config.getConfig(APPLICATION_CONFIG_NAME);
+        initDBReader(config.getConfig(DATA_BASE_CONFIG_NAME), applicationConfig);
+
+        initScheduledExecutorServiceForRuleUpdate(applicationConfig);
         startKafka(config.getConfig(KAFKA_CONFIG_NAME));
+    }
+
+    private void initDBReader(Config dbConfig, Config applicationConfig) {
+        dbReader = new DbReaderImpl(dbConfig, applicationConfig.getLong("enrichmentId"));
     }
 
     private void initScheduledExecutorServiceForRuleUpdate(Config ruleIntervalConfig) {
         String interval = ruleIntervalConfig.getString("updateIntervalSec");
-
         executorService.scheduleAtFixedRate(
                 this::updateRules,
                 0,
