@@ -424,7 +424,7 @@ class ServiceTest {
                     1L,
                     "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
-                    MONGO_TEST_CONDITION_FIELD_VALUE + "_not_expected",
+                    MONGO_TEST_CONDITION_FIELD_VALUE,
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
 
             Document testDocumentOne = new Document()
@@ -921,6 +921,12 @@ class ServiceTest {
                 .first());
         assertFalse(actualDocument.isEmpty());
         assertEquals(document, actualDocument.get());
+
+        log.info("Documents in MongoDB:");
+        mongoCollection
+                .find(eq(conditionField, conditionValue))
+                .forEach(d -> log.info("Document: {}", d));
+
     }
 
     private String toJson(Object object) {
