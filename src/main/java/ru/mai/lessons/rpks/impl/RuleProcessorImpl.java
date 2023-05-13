@@ -3,6 +3,7 @@ package ru.mai.lessons.rpks.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import ru.mai.lessons.rpks.MongoDBClient;
 import ru.mai.lessons.rpks.RuleProcessor;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public class RuleProcessorImpl implements RuleProcessor {
     private final MongoDBClient mongoDBClient;
@@ -55,7 +57,7 @@ public class RuleProcessorImpl implements RuleProcessor {
                     objectNodeOfMessage.put(fieldNameToEnrich, enrichmentValue);
                 });
 
-        return null;
+        return message;
     }
 
     private String getEnrichmentValueFromDocument(Rule rule, Optional<Document> documentOptional) {
@@ -72,6 +74,7 @@ public class RuleProcessorImpl implements RuleProcessor {
             ObjectNode object = new ObjectMapper().readValue(message.getValue(), ObjectNode.class);
             return Optional.of(object);
         } catch (IOException e) {
+            log.debug("exception : {}", e.getMessage());
             return Optional.empty();
         }
     }

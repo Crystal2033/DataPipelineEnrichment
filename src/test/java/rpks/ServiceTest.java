@@ -255,6 +255,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -306,6 +307,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocument);
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -314,6 +316,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -378,6 +381,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -452,6 +456,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 

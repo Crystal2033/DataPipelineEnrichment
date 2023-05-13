@@ -33,16 +33,20 @@ public class KafkaWriterImpl implements KafkaWriter {
         initKafkaProducer();
         Message checkedMessage = ruleProcessor.processing(message, rulesGetter.get());
         kafkaProducer.send(new ProducerRecord<>(topic, checkedMessage.getValue()));
+        log.debug("sent msg {}", checkedMessage.getValue());
     }
 
     private void initKafkaProducer() {
-        kafkaProducer = Optional.ofNullable(kafkaProducer).orElse(new KafkaProducer<>(
+        if (kafkaProducer != null) {
+            return;
+        }
+        kafkaProducer = new KafkaProducer<>(
                 Map.of(
                         ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                         ProducerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString()
                 ),
                 new StringSerializer(),
                 new StringSerializer()
-        ));
+        );
     }
 }

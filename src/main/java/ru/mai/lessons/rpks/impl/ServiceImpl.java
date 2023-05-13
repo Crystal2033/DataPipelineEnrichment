@@ -70,6 +70,7 @@ public class ServiceImpl implements Service {
                 .build();
 
         kafkaReader.processing();
+        log.debug("Start Service");
     }
 
     private void updateRules() {
