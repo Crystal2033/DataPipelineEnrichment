@@ -257,6 +257,8 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(3000L);
+
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -280,7 +282,7 @@ class ServiceTest {
 
     /**
      * Тест проверяет, что сервис обогащает сообщения по одному правилу:<p>
-     * В поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
+     * В поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
      * Ход выполнения теста: <p>
      * Запускается приложение с тестовыми конфигурациями в test/resources/application.conf.
      * Отправляется несколько сообщений во входной топик.
@@ -316,6 +318,8 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(3000L);
+
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -343,7 +347,7 @@ class ServiceTest {
 
     /**
      * Тест проверяет, что сервис обогащает сообщения по одному правилу:<p>
-     * В поле enrichment_field вставляется значение по умолчанию, так как в MongoDB нет документа который удовлетворяет условию condition_field_in_mongo = condition_value
+     * В поле enrichmentField вставляется значение по умолчанию, так как в MongoDB нет документа который удовлетворяет условию condition_field_in_mongo = condition_value
      * <p>
      * Ход выполнения теста:<p>
      * Запускается приложение с тестовыми конфигурациями в test/resources/application.conf.
@@ -380,6 +384,8 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(3000L);
+
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -408,7 +414,7 @@ class ServiceTest {
     /**
      * Тест проверяет, что сервис обогащает сообщения по одному правилу:
      * <p>
-     * В поле enrichment_field вставляется документ, который удовлетворяет условию condition_field_in_mongo = condition_value,
+     * В поле enrichmentField вставляется документ, который удовлетворяет условию condition_field_in_mongo = condition_value,
      * но так как в базе два таких документа, то берется последний как самый актуальный. Самый актуальный, у которого id больше остальных.
      * <p>
      * Ход выполнения теста:
@@ -454,6 +460,8 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(3000L);
+
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -481,8 +489,8 @@ class ServiceTest {
 
     /**
      * Тест проверяет, что сервис обогащает сообщения по двум правилам:<p>
-     * 1. В поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
-     * 2. В поле name вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
+     * 1. В поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
+     * 2. В поле enrichmentOtherField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
      * Ход выполнения теста: <p>
      * Запускается приложение с тестовыми конфигурациями в test/resources/application.conf.
      * Отправляется несколько сообщений во входной топик.
@@ -503,7 +511,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -531,6 +539,8 @@ class ServiceTest {
             );
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
+
+            Thread.sleep(3000L);
 
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
@@ -560,8 +570,8 @@ class ServiceTest {
 
     /**
      * Тест проверяет, что сервис обогащает сообщения только по одному правилу, если в PostgreSQL два разных правила, но обогащают одно и то же поле:<p>
-     * 1. В поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
-     * 2. В поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
+     * 1. В поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
+     * 2. В поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
      * Должно сработать то правило, чей rule_id больше - оно считается более актуальным.<p>
      * Ход выполнения теста: <p>
      * Запускается приложение с тестовыми конфигурациями в test/resources/application.conf.
@@ -612,6 +622,8 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(3000L);
+
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -639,8 +651,8 @@ class ServiceTest {
 
     /**
      * Тест проверяет, что сервис обогащает сообщения и проверяет обновление правил в PostgreSQL:<p>
-     * 1. В поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
-     * 2. Обновленное правило - в поле enrichment_field вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
+     * 1. В поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value<p>
+     * 2. Обновленное правило - в поле enrichmentField вставляется документ из MongoDB, который удовлетворяет условию condition_field_in_mongo = condition_value_other<p>
      * Ход выполнения теста: <p>
      * Запускается приложение с тестовыми конфигурациями в test/resources/application.conf.
      * Отправляется несколько сообщений во входной топик.
@@ -684,6 +696,8 @@ class ServiceTest {
             );
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
+
+            Thread.sleep(3000L);
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
