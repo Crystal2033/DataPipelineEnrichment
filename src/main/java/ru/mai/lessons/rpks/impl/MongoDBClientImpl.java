@@ -31,7 +31,7 @@ public class MongoDBClientImpl implements MongoDBClient {
         return Optional.ofNullable(
                 mongoCollection
                         .find(eq(fieldName, fieldValue))
-                        .sort(Sorts.ascending("id"))
+                        .sort(Sorts.descending("_id"))
                         .first()
         );
     }

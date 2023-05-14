@@ -1,5 +1,6 @@
 package ru.mai.lessons.rpks.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RuleProcessorImpl implements RuleProcessor {
     private final MongoDBClient mongoDBClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Message processing(Message message, Rule[] rules) {
         if (rules == null || rules.length == 0) {
             return message;
         }
+
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Optional<ObjectNode> objectNodeOfMessageOptional = translateMessageToObjectNodeOptional(message);
         if (objectNodeOfMessageOptional.isEmpty()) {
@@ -54,10 +58,15 @@ public class RuleProcessorImpl implements RuleProcessor {
                     );
 
                     String enrichmentValue = getEnrichmentValueFromDocument(rule, documentOptional);
-                    objectNodeOfMessage.put(fieldNameToEnrich, enrichmentValue);
+                    log.debug("enrichment value {}", enrichmentValue);
+
+                    JsonNode translatedToJsonNodeEnrichmentValue = translateStringToJsonNode(enrichmentValue);
+                    objectNodeOfMessage.put(fieldNameToEnrich, translatedToJsonNodeEnrichmentValue);
                 });
 
-        return message;
+        String translatedObjectNodeToString = translateObjectNodeToStringJson(objectNodeOfMessage);
+        log.debug("translated {}", translatedObjectNodeToString);
+        return new Message(translatedObjectNodeToString);
     }
 
     private String getEnrichmentValueFromDocument(Rule rule, Optional<Document> documentOptional) {
@@ -65,8 +74,8 @@ public class RuleProcessorImpl implements RuleProcessor {
             return rule.getFieldValueDefault();
         }
 
-        Document document = documentOptional.get();
-        return document.getString(rule.getFieldName());
+        Document enrichmentValueDocument = documentOptional.get();
+        return enrichmentValueDocument.toJson();
     }
 
     private Optional<ObjectNode> translateMessageToObjectNodeOptional(Message message) {
@@ -79,5 +88,20 @@ public class RuleProcessorImpl implements RuleProcessor {
         }
     }
 
+    private JsonNode translateStringToJsonNode(String jsonString) {
+        try {
+            return objectMapper.readTree(jsonString);
+        } catch (IOException e) {
+            return objectMapper.createObjectNode();
+        }
+    }
+
+    private String translateObjectNodeToStringJson(ObjectNode objectNode) {
+        try {
+            return objectMapper.writeValueAsString(objectNode);
+        } catch (IOException e) {
+            return "";
+        }
+    }
 
 }

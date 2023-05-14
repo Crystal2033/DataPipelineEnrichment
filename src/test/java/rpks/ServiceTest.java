@@ -265,6 +265,7 @@ class ServiceTest {
             var listExpectedJson = listDataIn.stream().map(this::toJson).toList();
 
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+                log.debug(consumerRecord.value());
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(consumerRecord.value()));
             }
@@ -328,7 +329,10 @@ class ServiceTest {
                 return toJson(data);
             }).toList();
 
+            listExpectedJson.forEach(log::debug);
+
             for (var consumerRecord : consumerRecords) {
+                log.debug(consumerRecord.value());
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(consumerRecord.value()));
             }
