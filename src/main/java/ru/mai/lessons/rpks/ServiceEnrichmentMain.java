@@ -7,12 +7,6 @@ import ru.mai.lessons.rpks.impl.ServiceImpl;
 @Slf4j
 public class ServiceEnrichmentMain {
     public static void main(String[] args) {
-//        GenerationTool.generate(
-//                Files.readString(
-//                        Path.of("jooq-config.xml")
-//                )
-//        );
-
         log.info("Start service Enrichment");
         ConfigReader configReader = new ConfigReaderImpl();
         Service service = new ServiceImpl(); // ваша реализация service

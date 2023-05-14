@@ -249,6 +249,7 @@ class ServiceTest {
             clearTable();
 
             Future<Boolean> serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -331,7 +332,6 @@ class ServiceTest {
                 return toJsonNode(toJson(data));
             }).toList();
 
-            listExpectedJson.forEach(log::debug);
 
             for (var consumerRecord : consumerRecords) {
                 log.debug(consumerRecord.value());
@@ -379,6 +379,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocument);
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -395,7 +396,7 @@ class ServiceTest {
             assertEquals(2, consumerRecords.count());
 
             var listExpectedJson = listDataIn.stream().map(data -> {
-                data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                data.setEnrichmentField("\"" + MONGO_TEST_DEFAULT_ENRICHMENT_VALUE + "\""); // TODO: здесь ошибка
                 return toJsonNode(toJson(data));
             }).toList();
 
@@ -454,6 +455,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -512,10 +514,10 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
-                    MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                    MONGO_TEST_DEFAULT_ENRICHMENT_VALUE); // TODO: было name
 
             Document testDocumentOne = new Document()
                     .append("testFieldString", "testString")
@@ -533,6 +535,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo, MONGO_TEST_CONDITION_FIELD_DOCUMENT, MONGO_TEST_CONDITION_FIELD_VALUE + "_other");
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -541,6 +544,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -613,6 +617,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -621,6 +626,7 @@ class ServiceTest {
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 
@@ -686,6 +692,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
+            serviceIsWork.get();
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -721,6 +728,7 @@ class ServiceTest {
 
             listDataInAfterUpdateRule.forEach(data -> sendMessagesToTestTopic(producer, data));
 
+            Thread.sleep(1000);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
 

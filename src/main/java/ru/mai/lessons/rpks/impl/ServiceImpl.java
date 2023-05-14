@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import ru.mai.lessons.rpks.*;
 import ru.mai.lessons.rpks.model.Rule;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

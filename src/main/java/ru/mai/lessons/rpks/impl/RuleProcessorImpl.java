@@ -29,8 +29,6 @@ public class RuleProcessorImpl implements RuleProcessor {
             return message;
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Optional<ObjectNode> objectNodeOfMessageOptional = translateMessageToObjectNodeOptional(message);
         if (objectNodeOfMessageOptional.isEmpty()) {
             return message;
@@ -58,10 +56,14 @@ public class RuleProcessorImpl implements RuleProcessor {
                     );
 
                     String enrichmentValue = getEnrichmentValueFromDocument(rule, documentOptional);
-                    log.debug("enrichment value {}", enrichmentValue);
+                    log.debug("enrichment value:{}", enrichmentValue);
 
-                    JsonNode translatedToJsonNodeEnrichmentValue = translateStringToJsonNode(enrichmentValue);
-                    objectNodeOfMessage.put(fieldNameToEnrich, translatedToJsonNodeEnrichmentValue);
+                    if (documentOptional.isEmpty()) {
+                        objectNodeOfMessage.put(fieldNameToEnrich, enrichmentValue);
+                    } else {
+                        JsonNode translatedToJsonNodeEnrichmentValue = translateStringToJsonNode(enrichmentValue);
+                        objectNodeOfMessage.put(fieldNameToEnrich, translatedToJsonNodeEnrichmentValue);
+                    }
                 });
 
         String translatedObjectNodeToString = translateObjectNodeToStringJson(objectNodeOfMessage);
