@@ -463,15 +463,6 @@ class ServiceTest {
                 return toJson(data);
             }).toList();
 
-            //**************************************
-            for (var valueList : listExpectedJson) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            for (var consumerRecord : consumerRecords) {
-                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
-            }
-            //**************************************
-
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(consumerRecord.value()));
@@ -550,6 +541,15 @@ class ServiceTest {
                 data.setName(testDocumentTwo.toJson());
                 return toJson(data);
             }).toList();
+
+            //**************************************
+            for (var valueList : listExpectedJson) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            for (var consumerRecord : consumerRecords) {
+                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
+            }
+            //**************************************
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
