@@ -12,4 +12,6 @@ public class TestDataModel {
     private String sex;
     @JsonRawValue
     private String enrichmentField;
+    @JsonRawValue
+    private String enrichmentOtherField;
 }
