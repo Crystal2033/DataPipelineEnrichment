@@ -35,4 +35,9 @@ public class MongoDBClientImpl implements MongoDBClient {
                         .first()
         );
     }
+
+    @Override
+    public void close() {
+        mongoClient.close();
+    }
 }
