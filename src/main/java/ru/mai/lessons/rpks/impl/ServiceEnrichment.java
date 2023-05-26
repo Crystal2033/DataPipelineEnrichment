@@ -17,7 +17,7 @@ public class ServiceEnrichment implements Service {
     private static final String RULE_CONFIG = "application";
     private static final String DB_CONFIG = "db";
     private static final String KAFKA_CONFIG = "kafka";
-    private static final String REDIS_CONFIG = "redis";
+    private static final String MONGO_CONFIG = "mongo";
 
     private Rule[] rules;
     private DbReader dbReader;
@@ -26,18 +26,19 @@ public class ServiceEnrichment implements Service {
 
     @Override
     public void start(Config config) {
-        dbReader = new DbReaderImpl(config.getConfig(DB_CONFIG));
+        Config ruleConfig = config.getConfig(RULE_CONFIG);
+        dbReader = new DbReaderImpl(config.getConfig(DB_CONFIG), ruleConfig.getLong("enrichmentId"));
 
         executor.scheduleAtFixedRate(
                 this::updateRules,
                 0,
-                Integer.parseInt(config.getConfig(RULE_CONFIG).getString("updateIntervalSec")),
+                Integer.parseInt(ruleConfig.getString("updateIntervalSec")),
                 TimeUnit.SECONDS
         );
 
         Config producer = config.getConfig(KAFKA_CONFIG).getConfig("producer");
         KafkaWriter writer = KafkaWriterImpl.builder()
-                .ruleProcessor(new RuleProcessorImpl(new RedisClientImpl(config.getConfig(REDIS_CONFIG))))
+                .ruleProcessor(new RuleProcessorImpl(new MongoDBClientImpl(config.getConfig(MONGO_CONFIG))))
                 .rulesGetter(this::getRules)
                 .topic(producer.getString("topic"))
                 .bootstrapServers(producer.getString("bootstrap.servers"))
