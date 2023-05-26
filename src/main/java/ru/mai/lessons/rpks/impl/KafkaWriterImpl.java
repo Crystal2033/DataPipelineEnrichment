@@ -27,16 +27,11 @@ public final class KafkaWriterImpl implements KafkaWriter {
 
     @Override
     public void processing(Message message) {
-        Message checkedMessage = ruleProcessor.processing(message, rulesGetter.get());
-        if (checkedMessage.isDeduplicationState())
-            send(message);
-    }
-
-    private void send(Message message) {
         if (Optional.ofNullable(kafkaProducer).isEmpty())
             init();
 
-        kafkaProducer.send(new ProducerRecord<>(topic, message.getValue()));
+        Message checkedMessage = ruleProcessor.processing(message, rulesGetter.get());
+        kafkaProducer.send(new ProducerRecord<>(topic, checkedMessage.getValue()));
     }
 
     private void init() {

@@ -5,83 +5,71 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.mai.lessons.rpks.RedisClient;
+import org.bson.Document;
+import ru.mai.lessons.rpks.MongoDBClientEnricher;
 import ru.mai.lessons.rpks.RuleProcessor;
 import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
 public final class RuleProcessorImpl implements RuleProcessor {
-    private final RedisClient redis;
+    private final MongoDBClientEnricher mongoClient;
 
     @Override
     public Message processing(Message message, Rule[] rules) {
-        if ((rules == null) || (rules.length == 0)) {
-            message.setDeduplicationState(true);
+        if ((rules == null) || (rules.length == 0))
             return message;
-        }
 
-        List<String> names = Arrays.stream(rules).filter(Rule::getIsActive).map(Rule::getFieldName).sorted().toList();
-        if (names.isEmpty()) {
-            message.setDeduplicationState(true);
+        JsonObject object = convertStringToJsonObject(message.getValue());
+        if (object.isEmpty())
             return message;
-        }
 
-        List<String> values = getValues(message, names);
-        if (values.isEmpty()) {
-            message.setDeduplicationState(false);
-            return message;
-        }
+        Map<String, Rule> namesWithRules = new HashMap<>();
+        Arrays.stream(rules).forEach(rule -> namesWithRules.merge(
+                        rule.getFieldName(),
+                        rule,
+                        (value, newValue) -> value.getRuleId() > newValue.getRuleId() ? value : newValue
+                )
+        );
+        namesWithRules.entrySet()
+                .stream()
+                .filter(entry -> object.has(entry.getKey()))
+                .forEach(entry -> {
+                    Rule rule = entry.getValue();
+                    Document doc = mongoClient.getDoc(rule.getFieldNameEnrichment(),rule.getFieldValue());
+                    String newValue = getNewValueFromDoc(rule, doc);
+                    log.info("New value: {}", newValue);
 
-        String joinedNames = joinStrings(names);
-        String joinedValues = joinStrings(values);
-
-        if (!redis.containsKey(joinedValues)) {
-            message.setDeduplicationState(true);
-            redis.write(joinedValues, joinedNames, getTime(rules));
-            return message;
-        }
-
-        if (redis.read(joinedValues).equals(joinedNames))
-            message.setDeduplicationState(false);
-        else {
-            redis.write(joinedValues, joinedNames, getTime(rules));
-            message.setDeduplicationState(true);
-        }
-        return message;
+                    if (Optional.ofNullable(doc).isEmpty())
+                        object.addProperty(entry.getKey(), newValue);
+                    else
+                        object.add(entry.getKey(), convertStringToJsonObject(newValue));
+                });
+        return new Message(convertJsonObjectToString(object));
     }
 
-    private List<String> getValues(Message message, List<String> activeFieldNames) {
+    private JsonObject convertStringToJsonObject(String jsonString) {
         try {
-            JsonObject jsonObject = JsonParser.parseString(message.getValue()).getAsJsonObject();
-            return activeFieldNames.stream()
-                    .map(fieldName -> jsonObject.get(fieldName).toString())
-                    .toList();
+            return JsonParser.parseString(jsonString).getAsJsonObject();
         } catch (JsonParseException | IllegalStateException e) {
-            return new ArrayList<>();
+            return new JsonObject();
         }
     }
 
-    private String joinStrings(List<String> strings) {
-        StringBuilder builder = new StringBuilder();
-        strings.forEach(string -> {
-            if (builder.length() != 0)
-                builder.append('-');
-            builder.append(string);
-        });
-        return builder.toString();
+    private String convertJsonObjectToString(JsonObject object) {
+        try {
+            return object.toString();
+        } catch (IllegalStateException e) {
+            return "";
+        }
     }
 
-    private long getTime(Rule[] rules) {
-        return Arrays.stream(rules)
-                .filter(Rule::getIsActive)
-                .mapToLong(Rule::getTimeToLiveSec)
-                .max()
-                .orElse(0);
+    private String getNewValueFromDoc(Rule rule, Document doc) {
+        if (Optional.ofNullable(doc).isEmpty())
+            return rule.getFieldValueDefault();
+        return doc.toJson();
     }
 }

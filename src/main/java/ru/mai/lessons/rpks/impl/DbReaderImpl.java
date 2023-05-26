@@ -9,6 +9,7 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import ru.mai.lessons.rpks.DbReader;
 import ru.mai.lessons.rpks.jooq.Tables;
+import ru.mai.lessons.rpks.jooq.tables.EnrichmentRules;
 import ru.mai.lessons.rpks.model.Rule;
 
 import java.sql.Connection;
@@ -17,14 +18,16 @@ import java.sql.SQLException;
 @Slf4j
 public final class DbReaderImpl implements DbReader {
     private final HikariDataSource hikari;
+    private final long id;
 
-    public DbReaderImpl(Config dbConfig) {
+    public DbReaderImpl(Config dbConfig, long id) {
         HikariConfig hDbConfig = new HikariConfig();
         hDbConfig.setJdbcUrl(dbConfig.getString("jdbcUrl"));
         hDbConfig.setUsername(dbConfig.getString("user"));
         hDbConfig.setPassword(dbConfig.getString("password"));
         hDbConfig.setDriverClassName(dbConfig.getString("driver"));
         hikari = new HikariDataSource(hDbConfig);
+        this.id = id;
     }
 
     @Override
@@ -34,6 +37,7 @@ public final class DbReaderImpl implements DbReader {
             return dsl
                     .select()
                     .from(Tables.ENRICHMENT_RULES)
+                    .where(EnrichmentRules.ENRICHMENT_RULES.ENRICHMENT_ID.eq(id))
                     .fetchInto(Rule.class)
                     .toArray(Rule[]::new);
         } catch (SQLException e) {
