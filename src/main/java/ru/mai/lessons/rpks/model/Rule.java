@@ -1,6 +1,11 @@
 package ru.mai.lessons.rpks.model;
 
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
 public class Rule {
     private Long enricherId; // id обогатителя
     private Long ruleId; // id правила обогащения

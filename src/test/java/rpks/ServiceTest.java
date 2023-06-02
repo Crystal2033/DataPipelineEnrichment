@@ -39,8 +39,8 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import org.testcontainers.utility.DockerImageName;
 import rpks.model.TestDataModel;
-import ru.mai.lessons.rpks.Service;
-import ru.mai.lessons.rpks.impl.ServiceEnrichment;
+import ru.mai.lessons.rpks.services.ServiceEnrichment;
+import ru.mai.lessons.rpks.services.interfaces.Service;
 
 import javax.sql.DataSource;
 import java.io.IOException;
