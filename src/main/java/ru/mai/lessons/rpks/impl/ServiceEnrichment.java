@@ -11,6 +11,7 @@ import ru.mai.lessons.rpks.model.Enrichment;
 import ru.mai.lessons.rpks.model.Rule;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -37,15 +38,15 @@ public class ServiceEnrichment implements Service {
         MongoDB mongoDB = new MongoDB();
 
         Queue<ArrayList<Enrichment>> queue = new ConcurrentLinkedQueue<>();
-        final int[] nRules = {1};
         new Thread(() -> {
             try {
-                while(nRules[0] > 0) {
+                String fieldName = "";
+                while(!Objects.equals(fieldName, "exit")) {
                     //Считываем правила из БД
                     Rule[] rules = dbreader.readRulesFromDB();
                     ArrayList<Enrichment> listEnrichments = new ArrayList<>();
 
-                    String fieldName = null;
+                    fieldName = null;
                     String fieldNameEnrichment = null;
                     String fieldValueDefault = null;
                     BasicDBObject criteria = new BasicDBObject();
@@ -55,24 +56,19 @@ public class ServiceEnrichment implements Service {
                         fieldName = rule.getFieldName();
                         fieldNameEnrichment = rule.getFieldNameEnrichment();
                         String fieldValue = rule.getFieldValue();
-                        fieldValueDefault = rule.getFieldValueDefault();
+                        fieldValueDefault = "\"" + rule.getFieldValueDefault() + "\"";
 
                         criteria.append(fieldNameEnrichment,fieldValue);
                         String valueDocument = mongoDB.readFromMongoDB(connectionString, database, collection, criteria);
                         if (valueDocument == null) valueDocument = fieldValueDefault;
-                        log.info("=========== valueDocument: {}", valueDocument);
 
                         Enrichment enrichment = new Enrichment(fieldName, valueDocument);
                         listEnrichments.add(enrichment);
                     }
 
-
                     if(!queue.isEmpty()) queue.remove();
                     queue.add(listEnrichments);
 
-
-
-                    nRules[0] = rules.length;
                     Thread.sleep(updateIntervalSec * 1000);
                 }
             } catch (InterruptedException ex) {

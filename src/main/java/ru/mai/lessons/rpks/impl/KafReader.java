@@ -68,7 +68,6 @@ public class KafReader implements KafkaReader {
                 ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
 
                 ArrayList<Enrichment> listEnrichments = queue.peek();
-                //Enrichment enrichment = queue.peek();
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                     String jsonString =  consumerRecord.value();
                     if (jsonString.isBlank()) continue;

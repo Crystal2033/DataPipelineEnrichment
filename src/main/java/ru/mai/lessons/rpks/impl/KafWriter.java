@@ -39,6 +39,6 @@ public class KafWriter implements KafkaWriter {
 
     public void processing(Message message) {
         kafkaProducer.send(new ProducerRecord<>(topic, message.getValue()));
-        log.info("------------------- MESSAGE_WRITE {}", message.getValue());
+        log.info("--- MESSAGE_WRITE {}", message.getValue());
     }
 }

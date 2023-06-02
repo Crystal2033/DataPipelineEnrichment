@@ -30,35 +30,22 @@ public class MongoDB {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
             MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collection);
 
-            ArrayList<Document> documents = mongoCollection.find().into(new ArrayList<>());
-            log.info("++++++ Found documents: {}", documents.size());
-            documents.forEach(doc -> log.info("++++++ Found: {}", doc.toJson()));
-
             Document findDocument = mongoCollection.find(criteria).sort(descending("_id")).first();
             if (findDocument != null) valueEnrichment = findDocument.toJson();
-            log.info("===========---- valueEnrichment: {}", valueEnrichment);
 
             int index = 1;
             if (valueEnrichment != null){
                 // Переносим _id в конец документа
                 index = valueEnrichment.indexOf(',');
                 String before = valueEnrichment.substring(1, index);
-                log.info("===========---- before: {}", before);
                 String after = valueEnrichment.substring(index+2, valueEnrichment.length() - 1);
-                log.info("===========---- after: {}", after);
                 valueEnrichment = "{" + after + ", " + before + "}";
             }
-
             return valueEnrichment;
         }
         catch (Exception ex){
             log.error("Error mongoClient", ex);
             return null;
         }
-
-
-
     }
-
-
 }

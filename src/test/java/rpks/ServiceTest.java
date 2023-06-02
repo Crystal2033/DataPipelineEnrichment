@@ -393,18 +393,10 @@ class ServiceTest {
             assertEquals(2, consumerRecords.count());
 
             var listExpectedJson = listDataIn.stream().map(data -> {
-                data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                //data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                data.setEnrichmentField("\""+ MONGO_TEST_DEFAULT_ENRICHMENT_VALUE + "\"");
                 return toJsonNode(toJson(data));
             }).toList();
-
-            //**************************************
-            for (var valueList : listExpectedJson) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            for (var consumerRecord : consumerRecords) {
-                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
-            }
-            //**************************************
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
@@ -563,15 +555,6 @@ class ServiceTest {
                 return toJsonNode(toJson(data));
             }).toList();
 
-            //**************************************
-            for (var valueList : listExpectedJson) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            for (var consumerRecord : consumerRecords) {
-                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
-            }
-            //**************************************
-
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
@@ -729,7 +712,8 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    //"name",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -751,21 +735,10 @@ class ServiceTest {
             assertEquals(4, consumerRecords.count());
 
             var listExpectedJsonAfterUpdated = listDataInAfterUpdateRule.stream().map(data -> {
-                data.setName(testDocumentOne.toJson());
+                //data.setName(testDocumentOne.toJson());
+                data.setEnrichmentOtherField(testDocumentOne.toJson());
                 return toJsonNode(toJson(data));
             }).toList();
-
-            //**************************************
-            for (var valueList : listExpectedJson) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            for (var consumerRecord : consumerRecords) {
-                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
-            }
-            for (var valueList : listExpectedJsonAfterUpdated) {
-                log.info("*************************************** valueList: {}", valueList);
-            }
-            //**************************************
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());

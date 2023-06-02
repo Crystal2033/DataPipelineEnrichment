@@ -22,7 +22,6 @@ import static com.mongodb.client.model.Filters.eq;
 @Slf4j
 @RequiredArgsConstructor
 public class RuleProcess implements RuleProcessor {
-    //private final MongoDB mongoDB;
     public Message processing(Message message, ArrayList<Enrichment> listEnrichments) throws ParseException {
         log.info("-------- MESSAGE {}", message.getValue());
 
@@ -36,20 +35,6 @@ public class RuleProcess implements RuleProcessor {
             map.put(keyValue[0], keyValue[1]);
         }
 
-        log.info("+++++++++++ map {}", map);
-
-        //JSONObject jsonObject = new JSONObject(map);
-//        String jsonString3 = jsonObject.toString();
-//        log.info("+++++++++++ jsonString3 {}", jsonString3);
-
-        //jsonString =  jsonString.replace(":-", ":null");
-        //jsonString =  jsonString.replace(":,", ":null,");
-//        jsonString =  jsonString.replace(":", ":\"");
-//        jsonString =  jsonString.replace(",", "\",");
-//        jsonString =  jsonString.replace("\"null", "null");
-//        JSONParser jsonParser = new JSONParser();
-//        JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-
         for (Enrichment enrichment : listEnrichments) {
             String fieldName = enrichment.getFieldName();              // поле сообщения, которое нужно обогатить
             String valueEnrichment = enrichment.getValueEnrichment(); // Value обогащения
@@ -57,7 +42,6 @@ public class RuleProcess implements RuleProcessor {
             if (fieldName != null && valueEnrichment != null)
             {
                 map.put("\"" + fieldName + "\"", valueEnrichment);
-                log.info("+++++++++++ map2 {}", map);
             }
         }
 
@@ -67,24 +51,10 @@ public class RuleProcess implements RuleProcessor {
         }
         jsonString2.delete(jsonString2.length() - 1, jsonString2.length());
         jsonString2.append("}");
-        log.info("=========== jsonString2 {}", jsonString2);
 
         message = Message.builder().value(jsonString2.toString()).build();
-        log.info("=========== message {}", message.getValue());
 
         return message;
-
     }
 
-//    private final ObjectMapper objectMapper = new ObjectMapper();
-//
-//    private String toJson(Object object) {
-//        String json = "{}";
-//        try {
-//            json = objectMapper.writeValueAsString(object);
-//        } catch (JsonProcessingException e) {
-//            log.error("Error convert object to json", e);
-//        }
-//        return json;
-//    }
 }
