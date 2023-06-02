@@ -2,7 +2,7 @@ package ru.mai.lessons.rpks.processors.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
-
+import org.json.JSONObject;
 import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 import ru.mai.lessons.rpks.mongo.impl.MongoEnrichmentClient;
@@ -17,7 +17,7 @@ public class EnrichmentProcessor implements RuleProcessor {
 private final MongoEnrichmentClient mongoEnrichmentClient;
     @Override
     public Optional<Message> processing(Message message, List<Rule> rules) {
-        //JSONObject jsonMessage = new JSONObject(checkingMessage.getValue());
+        //JSONObject jsonMessage = new JSONObject(message.getValue());
 
         for(Rule rule : rules){
             Optional<Document> document = mongoEnrichmentClient.getDocumentByRule(rule);

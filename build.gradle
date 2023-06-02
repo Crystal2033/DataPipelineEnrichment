@@ -16,6 +16,10 @@ dependencies {
     // json
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
 
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation 'org.json:json:20090211'
+
+
     // mongodb
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
 
