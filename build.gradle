@@ -13,6 +13,9 @@ dependencies {
     // kafka
     implementation 'org.apache.kafka:kafka-clients:3.4.0'
 
+    // json
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+
     // mongodb
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
 
@@ -31,8 +34,6 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation 'org.jooq:jooq:3.17.8'
 
-    // json
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
 
     // test
     testImplementation 'org.testcontainers:testcontainers:1.17.6'

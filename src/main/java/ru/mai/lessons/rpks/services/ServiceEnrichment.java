@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import ru.mai.lessons.rpks.dispatchers.EnrichmentDispatcher;
 import ru.mai.lessons.rpks.kafka.impl.KafkaReaderImpl;
+import ru.mai.lessons.rpks.mongo.impl.MongoEnrichmentClient;
 import ru.mai.lessons.rpks.processors.impl.EnrichmentProcessor;
 import ru.mai.lessons.rpks.processors.interfaces.RuleProcessor;
 import ru.mai.lessons.rpks.repository.impl.DataBaseReader;
@@ -66,9 +67,9 @@ public class ServiceEnrichment implements Service {
 
                 RulesUpdaterThread rulesDBUpdaterThread = new RulesUpdaterThread(dataBaseReader, outerConfig);
 
-                //RedisClient redisClient = new RedisClientImpl(outerConfig);
+                MongoEnrichmentClient mongoEnrichmentClient = new MongoEnrichmentClient(outerConfig);
 
-                RuleProcessor ruleProcessor = new EnrichmentProcessor();
+                RuleProcessor ruleProcessor = new EnrichmentProcessor(mongoEnrichmentClient);
 
                 EnrichmentDispatcher enrichmentDispatcher = new EnrichmentDispatcher(outerConfig, rulesDBUpdaterThread, ruleProcessor);
 
