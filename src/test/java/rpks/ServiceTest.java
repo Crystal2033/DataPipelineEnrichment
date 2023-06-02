@@ -391,6 +391,15 @@ class ServiceTest {
                 return toJsonNode(toJson(data));
             }).toList();
 
+            //**************************************
+            for (var valueList : listExpectedJson) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            for (var consumerRecord : consumerRecords) {
+                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
+            }
+            //**************************************
+
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));
@@ -503,7 +512,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -731,6 +740,18 @@ class ServiceTest {
                 data.setName(testDocumentOne.toJson());
                 return toJsonNode(toJson(data));
             }).toList();
+
+            //**************************************
+            for (var valueList : listExpectedJson) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            for (var consumerRecord : consumerRecords) {
+                log.info("************************** consumerRecord.value(): {}", consumerRecord.value());
+            }
+            for (var valueList : listExpectedJsonAfterUpdated) {
+                log.info("*************************************** valueList: {}", valueList);
+            }
+            //**************************************
 
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
