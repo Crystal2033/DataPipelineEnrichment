@@ -1,6 +1,12 @@
 package ru.mai.lessons.rpks.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@AllArgsConstructor
+@Data
 public class Rule {
     private Long enricherId; // id обогатителя
     private Long ruleId; // id правила обогащения

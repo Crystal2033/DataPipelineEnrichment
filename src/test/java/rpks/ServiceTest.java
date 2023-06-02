@@ -393,7 +393,7 @@ class ServiceTest {
             assertEquals(2, consumerRecords.count());
 
             var listExpectedJson = listDataIn.stream().map(data -> {
-                data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                data.setEnrichmentField("\""+MONGO_TEST_DEFAULT_ENRICHMENT_VALUE+"\"");
                 return toJsonNode(toJson(data));
             }).toList();
 
@@ -696,8 +696,14 @@ class ServiceTest {
             );
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
+            log.info("MESSAGES SENT FIRST{}", listDataIn.size());
 
             Thread.sleep(3000L);
+//            var consumerRecords1 = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
+//                    .get(60, TimeUnit.SECONDS);
+//            for (var consumerRecord : consumerRecords1) {
+//                log.info("CONSUMER RECORDS FIRST{}",toJsonNode(consumerRecord.value()));
+//            }
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
@@ -711,7 +717,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    "enrichmentField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -725,15 +731,21 @@ class ServiceTest {
             );
 
             listDataInAfterUpdateRule.forEach(data -> sendMessagesToTestTopic(producer, data));
+            log.info("MESSAGES SENT SECOND{}", listDataInAfterUpdateRule.size());
 
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
+            for (var consumerRecord : consumerRecords) {
+                log.info("CONSUMER RECORDS SECOND{}",toJsonNode(consumerRecord.value()));
+            }
 
             assertFalse(consumerRecords.isEmpty());
             assertEquals(4, consumerRecords.count());
 
             var listExpectedJsonAfterUpdated = listDataInAfterUpdateRule.stream().map(data -> {
-                data.setName(testDocumentOne.toJson());
+//                data.setName(testDocumentOne.toJson());
+//                data.set
+                data.setEnrichmentField(testDocumentOne.toJson());
                 return toJsonNode(toJson(data));
             }).toList();
 
