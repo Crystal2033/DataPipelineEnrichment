@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
+import org.bson.json.JsonMode;
+import org.bson.json.JsonWriterSettings;
 import org.json.JSONException;
 import org.json.JSONObject;
 import ru.mai.lessons.rpks.model.Message;
@@ -27,7 +29,7 @@ public class EnrichmentProcessor implements RuleProcessor {
     @Override
     public Message processing(Message message, List<Rule> rules) throws JSONException {
         JSONObject jsonMessage = new JSONObject(message.getValue());
-        ObjectMapper objectMapper = new ObjectMapper();
+        //ObjectMapper objectMapper = new ObjectMapper();
         for (Rule rule : rules) {
             Optional<Document> document = mongoEnrichmentClient.getDocumentByRule(rule);
             document.ifPresentOrElse(doc -> {
@@ -35,20 +37,17 @@ public class EnrichmentProcessor implements RuleProcessor {
 //                    JsonNode jsonNode = toJsonNode(doc.toJson());
 //                    log.info(jsonNode.toString());
 
-                    JsonNode tree = objectMapper.readTree(doc.toJson());
+                    //JsonNode tree = objectMapper.readTree(doc.toJson());
+                    //log.info(tree.toString());
                     if (jsonMessage.has(rule.getFieldName())) {
                         jsonMessage.put(rule.getFieldName(), doc.toJson());
-                        tree = objectMapper.readTree(jsonMessage.toString());
-                        log.info(tree.toString());
+                        //tree = objectMapper.readTree(jsonMessage.toString());
+                        //log.info(tree.toString());
                     } else {
                         jsonMessage.append(rule.getFieldName(), doc.toJson());
                     }
                 } catch (JSONException e) {
                     log.error("There is problem with appending new field in message. " + e.getMessage());
-                } catch (JsonMappingException e) {
-                    log.error("Problem with readTree mapping exception " + e.getMessage());
-                } catch (JsonProcessingException e) {
-                    log.error("Problem with readTree processing exception " + e.getMessage());
                 }
             }, () -> {
                 try {
@@ -62,18 +61,18 @@ public class EnrichmentProcessor implements RuleProcessor {
                 }
             });
         }
-        message.setValue(toJsonNode(jsonMessage.toString()).toString());
+        message.setValue(jsonMessage.toString());
         return message;
     }
 
-    private JsonNode toJsonNode(String json) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.createObjectNode();
-        try {
-            jsonNode = objectMapper.readTree(json);
-        } catch (IOException e) {
-            log.error("Error transformation json string to json node {}", json);
-        }
-        return jsonNode;
-    }
+//    private JsonNode toJsonNode(String json) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        JsonNode jsonNode = objectMapper.createObjectNode();
+//        try {
+//            jsonNode = objectMapper.readTree(json);
+//        } catch (IOException e) {
+//            log.error("Error transformation json string to json node {}", json);
+//        }
+//        return jsonNode;
+//    }
 }
