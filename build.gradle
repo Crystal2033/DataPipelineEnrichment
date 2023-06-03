@@ -13,6 +13,8 @@ dependencies {
     // kafka
     implementation 'org.apache.kafka:kafka-clients:3.4.0'
 
+    implementation 'org.apache.commons:commons-lang3:3.6'
+
     // json
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
 

@@ -39,15 +39,10 @@ public class EnrichmentDispatcher {
         if (rulesList.isEmpty()) {
             kafkaWriter.processing(getMessage(msgStr));
         } else {
-            try{
-                log.info("Before processor: " + msgStr);
-                Message message = ruleProcessor.processing(getMessage(msgStr), rulesList);
-                log.info("After processor: " + message.getValue());
-                kafkaWriter.processing(message);
-            }
-            catch (JSONException ex){
-                log.error("There is a problem with JSON: " + ex.getMessage());
-            }
+            log.info("Before processor: " + msgStr);
+            Message message = ruleProcessor.processing(getMessage(msgStr), rulesList);
+            log.info("After processor: " + message.getValue());
+            kafkaWriter.processing(message);
         }
     }
 
