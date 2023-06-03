@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.json.JSONException;
 import ru.mai.lessons.rpks.configs.ConfigurationReader;
 import ru.mai.lessons.rpks.configs.interfaces.ConfigReader;
 import ru.mai.lessons.rpks.dispatchers.EnrichmentDispatcher;
@@ -59,6 +60,7 @@ public class KafkaReaderImpl implements KafkaReader {
         }
         listenAndDelegateWork(kafkaConsumers.get(valueOfThreads - 1));
         executorService.shutdown();
+        log.info("Done reading");
     }
 
     private void listenAndDelegateWork(KafkaConsumer<String, String> kafkaConsumer) {

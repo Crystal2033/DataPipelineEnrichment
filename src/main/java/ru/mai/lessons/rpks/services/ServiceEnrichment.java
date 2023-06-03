@@ -68,6 +68,8 @@ public class ServiceEnrichment implements Service {
                 RulesUpdaterThread rulesDBUpdaterThread = new RulesUpdaterThread(dataBaseReader, outerConfig);
 
                 MongoEnrichmentClient mongoEnrichmentClient = new MongoEnrichmentClient(outerConfig);
+                mongoEnrichmentClient.connectToMongo();
+                mongoEnrichmentClient.initCollection();
 
                 RuleProcessor ruleProcessor = new EnrichmentProcessor(mongoEnrichmentClient);
 

@@ -2,6 +2,8 @@ package ru.mai.lessons.rpks.dispatchers;
 
 import com.typesafe.config.Config;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import ru.mai.lessons.rpks.exceptions.ThreadWorkerNotFoundException;
 import ru.mai.lessons.rpks.kafka.impl.KafkaWriterImpl;
 import ru.mai.lessons.rpks.model.Message;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public class EnrichmentDispatcher {
     private static final String KAFKA_NAME = "kafka";
     private static final String TOPIC_NAME_PATH = "topic.name";
@@ -30,14 +33,21 @@ public class EnrichmentDispatcher {
     }
 
 
-    public void actionWithMessage(String msg) throws ThreadWorkerNotFoundException {
+    public void actionWithMessage(String msgStr) throws ThreadWorkerNotFoundException {
         kafkaWriter = Optional.ofNullable(kafkaWriter).orElseGet(this::createKafkaWriterForSendingMessage);
         updateRules();
         if (rulesList.isEmpty()) {
-            kafkaWriter.processing(getMessage(msg));
+            kafkaWriter.processing(getMessage(msgStr));
         } else {
-            Optional<Message> optionalMessage = ruleProcessor.processing(getMessage(msg), rulesList);
-            optionalMessage.ifPresent(kafkaWriter::processing);
+            try{
+                log.info("Before processor: " + msgStr);
+                Message message = ruleProcessor.processing(getMessage(msgStr), rulesList);
+                log.info("After processor: " + message.getValue());
+                kafkaWriter.processing(message);
+            }
+            catch (JSONException ex){
+                log.error("There is a problem with JSON: " + ex.getMessage());
+            }
         }
     }
 
