@@ -311,7 +311,7 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocument);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(10000L); //TODO: ADDED BY AUTHOR
+            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
 
             var listDataIn = List.of(
