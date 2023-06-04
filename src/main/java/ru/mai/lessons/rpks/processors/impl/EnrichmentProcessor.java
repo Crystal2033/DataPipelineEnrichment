@@ -68,8 +68,11 @@ public class EnrichmentProcessor implements RuleProcessor {
         int insertingJsonStartIndex = goodJson.indexOf("\"" + rule.getFieldName() + "\"") + rule.getFieldName().length() + 2 + 1;
         //2 + 1 is for '\"'  and ':' and plus 1 for startingIndex.
         // Here I want to get the end of insertingJsonValue in fullJson (with inserted new json) to
-        //carefully delete last '\"'
-        goodJson.replace(insertingJsonStartIndex + insertingJsonValue.length(), insertingJsonStartIndex + insertingJsonValue.length() + 1, "");
+        //carefully delete last '\"' after closing } if it exists
+
+        if(goodJson.charAt(insertingJsonStartIndex + insertingJsonValue.length()) == '\"'){
+            goodJson.replace(insertingJsonStartIndex + insertingJsonValue.length(), insertingJsonStartIndex + insertingJsonValue.length() + 1, "");
+        }
         return goodJson.toString();
     }
 
