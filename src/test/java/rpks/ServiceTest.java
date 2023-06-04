@@ -97,7 +97,8 @@ class ServiceTest {
     private static final String MONGO_TEST_DB = "enrichment_db";
     private static final String MONGO_TEST_COLLECTION = "enrichment_collection";
     private static final String MONGO_TEST_CONDITION_FIELD_DOCUMENT = "condition_field_in_mongo";
-    private static final String MONGO_TEST_DEFAULT_ENRICHMENT_VALUE = "default_value";
+    private static final String MONGO_TEST_DEFAULT_ENRICHMENT_VALUE = "\"default_value\"";
+
     private static final String MONGO_TEST_CONDITION_FIELD_VALUE = "condition_value";
 
     private static final Integer UPDATE_INTERVAL_POSTGRESQL_RULE_SECS = 10;
@@ -711,7 +712,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                    "name",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
@@ -733,7 +734,7 @@ class ServiceTest {
             assertEquals(4, consumerRecords.count());
 
             var listExpectedJsonAfterUpdated = listDataInAfterUpdateRule.stream().map(data -> {
-                data.setName(testDocumentOne.toJson());
+                data.setEnrichmentOtherField(testDocumentOne.toJson());
                 return toJsonNode(toJson(data));
             }).toList();
 
