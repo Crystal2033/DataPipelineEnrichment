@@ -88,7 +88,7 @@ public class ServiceEnrichment implements Service {
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         } finally {
-            log.info("All threads are done.");
+            log.debug("All threads are done.");
             executorService.shutdownNow();
         }
     }

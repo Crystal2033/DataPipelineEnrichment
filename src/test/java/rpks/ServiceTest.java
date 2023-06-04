@@ -401,7 +401,7 @@ class ServiceTest {
                 data.setEnrichmentField("\"" + MONGO_TEST_DEFAULT_ENRICHMENT_VALUE + "\"");
                 return toJsonNode(toJson(data));
             }).toList();
-            log.error("Now checking my data");
+
             for (var consumerRecord : consumerRecords) {
                 assertNotNull(consumerRecord.value());
                 assertTrue(listExpectedJson.contains(toJsonNode(consumerRecord.value())));

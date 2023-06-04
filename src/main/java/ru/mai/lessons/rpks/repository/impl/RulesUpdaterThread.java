@@ -39,8 +39,5 @@ public class RulesUpdaterThread implements Runnable {
     @Override
     public void run() {
         rules = makeUniqueListWithLatestInfo(List.of(dataBaseReader.readRulesFromDB()));
-        for (Rule rule : rules) {
-            log.info(rule.getFieldName() + " " + rule.getFieldValue());
-        }
     }
 }

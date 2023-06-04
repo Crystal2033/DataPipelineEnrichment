@@ -38,9 +38,7 @@ public class EnrichmentDispatcher {
         if (rulesList.isEmpty()) {
             kafkaWriter.processing(getMessage(msgStr));
         } else {
-            log.info("Before processor: " + msgStr);
             Message message = ruleProcessor.processing(getMessage(msgStr), rulesList);
-            log.info("After processor: " + message.getValue());
             kafkaWriter.processing(message);
         }
     }

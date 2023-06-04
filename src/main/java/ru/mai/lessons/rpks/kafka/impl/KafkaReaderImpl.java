@@ -59,7 +59,6 @@ public class KafkaReaderImpl implements KafkaReader {
         }
         listenAndDelegateWork(kafkaConsumers.get(valueOfThreads - 1));
         executorService.shutdown();
-        log.info("Done reading");
     }
 
     private void listenAndDelegateWork(KafkaConsumer<String, String> kafkaConsumer) {
@@ -67,7 +66,6 @@ public class KafkaReaderImpl implements KafkaReader {
             while (true) {
                 ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-                    log.info("Message from kafka: " + consumerRecord.value());
                     sendForEnrichment(consumerRecord.value());
                 }
             }
