@@ -696,14 +696,8 @@ class ServiceTest {
             );
 
             listDataIn.forEach(data -> sendMessagesToTestTopic(producer, data));
-            log.info("MESSAGES SENT FIRST{}", listDataIn.size());
 
             Thread.sleep(3000L);
-//            var consumerRecords1 = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
-//                    .get(60, TimeUnit.SECONDS);
-//            for (var consumerRecord : consumerRecords1) {
-//                log.info("CONSUMER RECORDS FIRST{}",toJsonNode(consumerRecord.value()));
-//            }
 
             var listExpectedJson = listDataIn.stream().map(data -> {
                 data.setEnrichmentField(testDocumentTwo.toJson());
@@ -731,20 +725,14 @@ class ServiceTest {
             );
 
             listDataInAfterUpdateRule.forEach(data -> sendMessagesToTestTopic(producer, data));
-            log.info("MESSAGES SENT SECOND{}", listDataInAfterUpdateRule.size());
-
+            Thread.sleep(3000L);
             var consumerRecords = executorForTest.submit(() -> getConsumerRecordsOutputTopic(consumer, 10, 1))
                     .get(60, TimeUnit.SECONDS);
-            for (var consumerRecord : consumerRecords) {
-                log.info("CONSUMER RECORDS SECOND{}",toJsonNode(consumerRecord.value()));
-            }
 
             assertFalse(consumerRecords.isEmpty());
             assertEquals(4, consumerRecords.count());
 
             var listExpectedJsonAfterUpdated = listDataInAfterUpdateRule.stream().map(data -> {
-//                data.setName(testDocumentOne.toJson());
-//                data.set
                 data.setEnrichmentField(testDocumentOne.toJson());
                 return toJsonNode(toJson(data));
             }).toList();

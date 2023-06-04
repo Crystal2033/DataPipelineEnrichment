@@ -43,7 +43,6 @@ public class KafkaReaderImpl implements KafkaReader {
     @NonNull
     MongoClientImpl mongoClient;
     private boolean isExit;
-    ConcurrentLinkedQueue<Message> queue;
 
     public void processing() {
         log.info("Start reading kafka topic {}", topic);
@@ -53,7 +52,7 @@ public class KafkaReaderImpl implements KafkaReader {
                         ConsumerConfig.GROUP_ID_CONFIG, "tc-" + UUID.randomUUID(),
                         ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
                 ),
-                new org.apache.kafka.common.serialization.StringDeserializer(),
+                new StringDeserializer(),
                 new StringDeserializer()
         );
 
@@ -80,12 +79,9 @@ public class KafkaReaderImpl implements KafkaReader {
         }
         log.info("Message from Kafka topic {} : {}", consumerRecord.topic(), consumerRecord.value());
 
-        log.info(String.valueOf(consumerRecord));
-        queue = new ConcurrentLinkedQueue<>();
         Message msg = new Message(consumerRecord.value());
         RuleProcessorImpl ruleProcessor = new RuleProcessorImpl(config, mongoClient);
-        queue = new ConcurrentLinkedQueue<>();
-        queue.add(ruleProcessor.processing(msg, rules));
+        Message processedMsg = ruleProcessor.processing(msg, rules);
         log.info("Start write message in kafka out topic {}", topicOut);
         try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(
                 Map.of(
@@ -95,18 +91,13 @@ public class KafkaReaderImpl implements KafkaReader {
                 new StringSerializer(),
                 new StringSerializer()
         )) {
-            if (!queue.isEmpty()) {
-                Message queueElement = queue.peek();
-                log.info("Queue element {}", queueElement);
-                queue.remove();
+            if (processedMsg != null) {
                 Future<RecordMetadata> response = null;
-
-
-                if (Objects.equals(queueElement.getValue(), "$exit")) {
+                if (Objects.equals(processedMsg.getValue(), "$exit")) {
                     isExit = true;
                     return;
                 }
-                response = kafkaProducer.send(new ProducerRecord<>(topicOut, queueElement.getValue()));
+                response = kafkaProducer.send(new ProducerRecord<>(topicOut, processedMsg.getValue()));
                 Optional.ofNullable(response).ifPresent(rsp -> {
                     try {
                         log.info("Message send to out{}", rsp.get());
@@ -118,7 +109,7 @@ public class KafkaReaderImpl implements KafkaReader {
             }
 
         }catch (KafkaException e) {
-            e.printStackTrace();
+            log.error("caught kafka exception");
         }
 
     }

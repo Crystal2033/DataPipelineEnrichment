@@ -25,6 +25,8 @@ public class Db implements DbReader {
     DataSource dataSource;
     @NonNull
     Config config;
+    @NonNull
+    String dbDriver;
     Connection getConnection() throws SQLException {
         return getDataSource().getConnection();
     }
@@ -37,34 +39,32 @@ public class Db implements DbReader {
     }
     void createDataSource(){
         try {
-            String driver = config.getString("db.driver");
-            Class.forName(driver);
+            Class.forName(dbDriver);
             HikariConfig hikariConfig = getHikariConfig();
             log.info("Configuration is ready.");
             log.info("Creating the HiKariDataSource and assigning it as the global");
             dataSource = new HikariDataSource(hikariConfig);
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error("caught datasource exception");
         }
     }
     HikariConfig getHikariConfig() {
         log.info("Creating the config with HikariConfig");
-        String driver = config.getString("db.driver");
         HikariConfig hikaConfig = null;
         try {
             hikaConfig = new HikariConfig();
-            Class.forName(driver);
+            Class.forName(dbDriver);
             hikaConfig.setJdbcUrl(config.getString("db.jdbcUrl"));
             //username
             hikaConfig.setUsername(config.getString("db.user"));
             //password
             hikaConfig.setPassword(config.getString("db.password"));
             //driver class name
-            hikaConfig.setDriverClassName(driver);
+            hikaConfig.setDriverClassName(dbDriver);
             return hikaConfig;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("caught hika config exception");
         }
 
         return hikaConfig;
@@ -74,29 +74,11 @@ public class Db implements DbReader {
     public Rule[] readRulesFromDB() {
         try (Connection connection = getConnection()) {
             DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
-            String tableName = "enrichment_rules";
+            String tableName = config.getString("db.table");
             int numberOfRows = context.fetchCount(context.selectFrom(tableName));
             Rule[] ruleArray = new Rule[numberOfRows];
-            Result<Record6<Object, Object, Object, Object, Object, Object>> result = null;
-            @NotNull SelectJoinStep<Record6<Object, Object, Object, Object, Object, Object>> result2;
+            var result = context.select().from(tableName).fetch();
             ArrayList<Rule> array = new ArrayList<>();
-            String fieldNameFilterId = "enrichment_id";
-            result2 = context.select(
-                            field("enrichment_id"),
-                            field("rule_id"),
-                            field("field_name"),
-                            field("field_name_enrichment"),
-                            field("field_value"),
-                            field("field_value_default")
-                    )
-                    .from(table(tableName));
-            log.info("RESULT2 {}", result2);
-
-            result = result2.fetch();
-
-            log.info("RESULT {}", result.getValues(fieldNameFilterId).isEmpty());
-
-
             result.forEach(res -> {
                 try {
                     Long enrichmentId = (Long)res.getValue("enrichment_id");
@@ -108,18 +90,18 @@ public class Db implements DbReader {
                     Rule rule = new Rule(enrichmentId, ruleId, fieldName, fieldNameEnrichment, fieldValue, fieldValueDefault);
                     array.add(rule);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("caight rule exception");
                 }
             });
             array.toArray(ruleArray);
             return ruleArray;
         }
         catch (SQLException e) {
-            log.info("DB rules error!");
+            log.error("DB rules error!");
             throw new IllegalStateException("DB rules error");
         }
         catch (Exception e) {
-            log.info("CAUGHT FETCH EX");
+            log.error("CAUGHT FETCH EX");
             return new Rule[0];
         }
 
