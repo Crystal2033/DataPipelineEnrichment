@@ -249,7 +249,6 @@ class ServiceTest {
             clearTable();
 
             Future<Boolean> serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -311,7 +310,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocument);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
 
             var listDataIn = List.of(
@@ -380,7 +378,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocument);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -457,7 +454,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -538,7 +534,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo, MONGO_TEST_CONDITION_FIELD_DOCUMENT, MONGO_TEST_CONDITION_FIELD_VALUE + "_other");
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -621,7 +616,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),
@@ -697,7 +691,6 @@ class ServiceTest {
             createAndCheckDocumentInMongoDB(testDocumentTwo);
 
             var serviceIsWork = testStartService();
-            Thread.sleep(3000L); //TODO: ADDED BY AUTHOR
 
             var listDataIn = List.of(
                     TestDataModel.builder().name("alex").age(18).sex("M").build(),

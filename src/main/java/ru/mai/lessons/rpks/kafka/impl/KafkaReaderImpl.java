@@ -49,22 +49,24 @@ public class KafkaReaderImpl implements KafkaReader {
 
         kafkaConsumers = new ArrayList<>();
         ExecutorService executorService = Executors.newFixedThreadPool(valueOfThreads);
-        for (int i = 0; i < valueOfThreads; i++) {
+        for (int i = 0; i < valueOfThreads - 1; i++) {
             KafkaConsumer<String, String> kafkaConsumer = initKafkaConsumer();
             kafkaConsumers.add(kafkaConsumer);
             kafkaConsumer.subscribe(Collections.singletonList(topic));
-            if (i != valueOfThreads - 1) {
-                executorService.execute(() -> listenAndDelegateWork(kafkaConsumer));
-            }
+            executorService.execute(() -> listenAndDelegateWork(kafkaConsumer));
         }
-        listenAndDelegateWork(kafkaConsumers.get(valueOfThreads - 1));
+        KafkaConsumer<String, String> kafkaConsumer = initKafkaConsumer();
+        kafkaConsumers.add(kafkaConsumer);
+        kafkaConsumer.subscribe(Collections.singletonList(topic));
+        listenAndDelegateWork(kafkaConsumer);
+
         executorService.shutdown();
     }
 
     private void listenAndDelegateWork(KafkaConsumer<String, String> kafkaConsumer) {
         try (kafkaConsumer) {
             while (true) {
-                ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(1));
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                     sendForEnrichment(consumerRecord.value());
                 }

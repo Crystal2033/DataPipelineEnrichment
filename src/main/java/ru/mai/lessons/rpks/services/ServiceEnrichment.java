@@ -12,6 +12,7 @@ import ru.mai.lessons.rpks.repository.impl.RulesUpdaterThread;
 import ru.mai.lessons.rpks.services.interfaces.Service;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +66,6 @@ public class ServiceEnrichment implements Service {
     private void connectAndRun(DataBaseReader dataBaseReader, ScheduledExecutorService executorService) {
         try {
             if (dataBaseReader.connectToDataBase()) {
-
                 RulesUpdaterThread rulesDBUpdaterThread = new RulesUpdaterThread(dataBaseReader, outerConfig);
 
                 MongoEnrichmentClient mongoEnrichmentClient = new MongoEnrichmentClient(outerConfig);

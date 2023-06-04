@@ -19,16 +19,16 @@ import java.util.Optional;
 @Slf4j
 public class EnrichmentProcessor implements RuleProcessor {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private final MongoEnrichmentClient mongoEnrichmentClient;
 
     @Override
     public Message processing(Message message, List<Rule> rules) {
-        ObjectMapper objectMapper = new ObjectMapper();
         for (Rule rule : rules) {
             Optional<Document> document = mongoEnrichmentClient.getDocumentByRule(rule);
             document.ifPresentOrElse(doc -> {
                 try {
-                    String insertingJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(doc.toJson());
+                    String insertingJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(doc.toJson());
                     String goodJson = getGoodJsonAfterInsertion(insertingJson, message, rule);
                     message.setValue(goodJson);
                 } catch (JSONException e) {
@@ -38,7 +38,7 @@ public class EnrichmentProcessor implements RuleProcessor {
                 }
             }, () -> {
                 try {
-                    String insertingJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rule.getFieldValueDefault());
+                    String insertingJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rule.getFieldValueDefault());
                     String goodJson = getGoodJsonAfterInsertion(insertingJson, message, rule);
                     message.setValue(goodJson);
                 } catch (JSONException e) {
