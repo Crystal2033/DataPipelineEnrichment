@@ -14,7 +14,7 @@ import static com.mongodb.client.model.Filters.eq;
 @RequiredArgsConstructor
 public class MongoEnrichmentClient {
 
-    private static final String MONGO_STR ="mongo";
+    private static final String MONGO_STR = "mongo";
     private final Config connectionConfig;
     private MongoClient mongoClient;
 

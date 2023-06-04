@@ -22,6 +22,7 @@ public class ServiceEnrichment implements Service {
     private static final String KAFKA_NAME = "kafka";
     private static final String TOPIC_NAME_PATH = "topic.name";
     private Config outerConfig;
+
     @Override
     public void start(Config config) {
         outerConfig = config;

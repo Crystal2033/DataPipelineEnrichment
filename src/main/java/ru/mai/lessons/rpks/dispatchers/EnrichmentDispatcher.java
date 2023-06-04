@@ -3,7 +3,6 @@ package ru.mai.lessons.rpks.dispatchers;
 import com.typesafe.config.Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONException;
 import ru.mai.lessons.rpks.exceptions.ThreadWorkerNotFoundException;
 import ru.mai.lessons.rpks.kafka.impl.KafkaWriterImpl;
 import ru.mai.lessons.rpks.model.Message;

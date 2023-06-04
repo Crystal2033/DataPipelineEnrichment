@@ -11,7 +11,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.json.JSONException;
 import ru.mai.lessons.rpks.configs.ConfigurationReader;
 import ru.mai.lessons.rpks.configs.interfaces.ConfigReader;
 import ru.mai.lessons.rpks.dispatchers.EnrichmentDispatcher;

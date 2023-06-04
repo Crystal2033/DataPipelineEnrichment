@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.bson.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,11 +48,7 @@ public class EnrichmentProcessor implements RuleProcessor {
                 }
             });
         }
-        try {
-            JSONObject testJson = new JSONObject(message.getValue());
-        } catch (JSONException e) {
-            log.error("There is problem with parsing JSON. " + e.getMessage());
-        }
+
         return message;
     }
 
@@ -70,7 +65,7 @@ public class EnrichmentProcessor implements RuleProcessor {
         // Here I want to get the end of insertingJsonValue in fullJson (with inserted new json) to
         //carefully delete last '\"' after closing } if it exists
 
-        if(goodJson.charAt(insertingJsonStartIndex + insertingJsonValue.length()) == '\"'){
+        if (goodJson.charAt(insertingJsonStartIndex + insertingJsonValue.length()) == '\"') {
             goodJson.replace(insertingJsonStartIndex + insertingJsonValue.length(), insertingJsonStartIndex + insertingJsonValue.length() + 1, "");
         }
         return goodJson.toString();
@@ -84,14 +79,4 @@ public class EnrichmentProcessor implements RuleProcessor {
             index = builder.indexOf(from, index);
         }
     }
-//    private JsonNode toJsonNode(String json) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        JsonNode jsonNode = objectMapper.createObjectNode();
-//        try {
-//            jsonNode = objectMapper.readTree(json);
-//        } catch (IOException e) {
-//            log.error("Error transformation json string to json node {}", json);
-//        }
-//        return jsonNode;
-//    }
 }
