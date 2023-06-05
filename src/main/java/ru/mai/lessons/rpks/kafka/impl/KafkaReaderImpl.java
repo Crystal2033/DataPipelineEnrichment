@@ -49,16 +49,15 @@ public class KafkaReaderImpl implements KafkaReader {
 
         kafkaConsumers = new ArrayList<>();
         ExecutorService executorService = Executors.newFixedThreadPool(valueOfThreads);
-        for (int i = 0; i < valueOfThreads - 1; i++) {
+        for (int i = 0; i < valueOfThreads; i++) {
             KafkaConsumer<String, String> kafkaConsumer = initKafkaConsumer();
             kafkaConsumers.add(kafkaConsumer);
             kafkaConsumer.subscribe(Collections.singletonList(topic));
-            executorService.execute(() -> listenAndDelegateWork(kafkaConsumer));
+            if (i != valueOfThreads - 1) {
+                executorService.execute(() -> listenAndDelegateWork(kafkaConsumer));
+            }
         }
-        KafkaConsumer<String, String> kafkaConsumer = initKafkaConsumer();
-        kafkaConsumers.add(kafkaConsumer);
-        kafkaConsumer.subscribe(Collections.singletonList(topic));
-        listenAndDelegateWork(kafkaConsumer);
+        listenAndDelegateWork(kafkaConsumers.get(valueOfThreads - 1));
 
         executorService.shutdown();
     }
