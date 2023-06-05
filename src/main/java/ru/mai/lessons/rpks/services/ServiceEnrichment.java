@@ -2,7 +2,6 @@ package ru.mai.lessons.rpks.services;
 
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import ru.mai.lessons.rpks.configs.ConfigurationReader;
 import ru.mai.lessons.rpks.dispatchers.EnrichmentDispatcher;
 import ru.mai.lessons.rpks.kafka.impl.KafkaReaderImpl;
 import ru.mai.lessons.rpks.mongo.impl.MongoEnrichmentClient;
@@ -34,13 +33,11 @@ public class ServiceEnrichment implements Service {
     }
 
     private void startKafkaReader(EnrichmentDispatcher dispatcherKafka) {
-
         Config config = outerConfig.getConfig(KAFKA_NAME).getConfig("consumer");
-        Config myConfig = new ConfigurationReader().loadConfig().getConfig(KAFKA_NAME).getConfig("consumer");
 
         KafkaReaderImpl kafkaReader = KafkaReaderImpl.builder()
                 .topic(config.getConfig("enrichment").getString(TOPIC_NAME_PATH))
-                .autoOffsetReset(myConfig.getString(("auto.offset.reset")))
+                .autoOffsetReset(config.getString(("auto.offset.reset")))
                 .bootstrapServers(config.getString("bootstrap.servers"))
                 .groupId(config.getString("group.id"))
                 .dispatcherKafka(dispatcherKafka)
