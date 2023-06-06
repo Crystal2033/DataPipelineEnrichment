@@ -23,8 +23,6 @@ import static com.mongodb.client.model.Filters.eq;
 @RequiredArgsConstructor
 public class RuleProcess implements RuleProcessor {
     public Message processing(Message message, ArrayList<Enrichment> listEnrichments) throws ParseException {
-        log.info("-------- MESSAGE {}", message.getValue());
-
         String jsonString = message.getValue();
         jsonString =  jsonString.replaceAll("[{}]", ""); // Удаляем {}
 

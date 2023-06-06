@@ -28,8 +28,9 @@ public class ServiceEnrichment implements Service {
         String user = db.getString("user");
         String password = db.getString("password");
         String driver = db.getString("driver");
+        String tableName = db.getString("tableName");
         Long updateIntervalSec = config.getLong("application.updateIntervalSec");
-        DbReader dbreader = new ReaderDB(url, user, password, driver);
+        DbReader dbreader = new ReaderDB(url, user, password, driver, tableName);
 
         // Считываем параметры конфигурации для подключения к MongoDB
         String connectionString = config.getString("mongo.connectionString");
@@ -40,20 +41,18 @@ public class ServiceEnrichment implements Service {
         Queue<ArrayList<Enrichment>> queue = new ConcurrentLinkedQueue<>();
         new Thread(() -> {
             try {
-                String fieldName = "";
-                while(!Objects.equals(fieldName, "exit")) {
+                while(true) {
                     //Считываем правила из БД
                     Rule[] rules = dbreader.readRulesFromDB();
                     ArrayList<Enrichment> listEnrichments = new ArrayList<>();
 
-                    fieldName = null;
                     String fieldNameEnrichment = null;
                     String fieldValueDefault = null;
                     BasicDBObject criteria = new BasicDBObject();
                     for (Rule rule : rules)
                     {
                         // Поля для поиска документа в MongoDB и записи в Message
-                        fieldName = rule.getFieldName();
+                        String fieldName = rule.getFieldName();
                         fieldNameEnrichment = rule.getFieldNameEnrichment();
                         String fieldValue = rule.getFieldValue();
                         fieldValueDefault = "\"" + rule.getFieldValueDefault() + "\"";

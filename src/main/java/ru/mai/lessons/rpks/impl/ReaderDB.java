@@ -22,9 +22,9 @@ public class ReaderDB implements DbReader {
     private final String user;
     private final String password;
     private final String driver;
+    private final String tableName;
     public Rule[] readRulesFromDB()
     {
-        final String tableName = "enrichment_rules";
         ArrayList<Rule> listRules = new ArrayList<>();
 
         try {
