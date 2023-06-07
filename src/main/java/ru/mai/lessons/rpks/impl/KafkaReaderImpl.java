@@ -45,12 +45,14 @@ public class KafkaReaderImpl implements KafkaReader {
     private boolean isExit;
 
     public void processing() {
-        log.info("Start reading kafka topic {}", topic);
+        KafkaWriterImpl kafkaWriter = new KafkaWriterImpl(config);
+        RuleProcessorImpl ruleProcessor = new RuleProcessorImpl(config, mongoClient);
+        log.debug("Start reading kafka topic {}", topic);
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(
                 Map.of(
                         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                         ConsumerConfig.GROUP_ID_CONFIG, "tc-" + UUID.randomUUID(),
-                        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
+                        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, config.getString("kafka.consumer.auto.offset.reset")
                 ),
                 new StringDeserializer(),
                 new StringDeserializer()
@@ -65,52 +67,13 @@ public class KafkaReaderImpl implements KafkaReader {
                 consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords)
                 {
-                    kafkaSend(consumerRecord);
+                    Message msg = new Message(consumerRecord.value());
+                    Message processedMsg = ruleProcessor.processing(msg, rules);
+                    kafkaWriter.processing(processedMsg);
                 }
             }
             log.info("Read is done!");
 
         }
-    }
-    private void kafkaSend(ConsumerRecord<String, String> consumerRecord){
-
-        if (consumerRecord.value().equals("$exit")) {
-            isExit = true;
-        }
-        log.info("Message from Kafka topic {} : {}", consumerRecord.topic(), consumerRecord.value());
-
-        Message msg = new Message(consumerRecord.value());
-        RuleProcessorImpl ruleProcessor = new RuleProcessorImpl(config, mongoClient);
-        Message processedMsg = ruleProcessor.processing(msg, rules);
-        log.info("Start write message in kafka out topic {}", topicOut);
-        try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(
-                Map.of(
-                        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersWriter,
-                        ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString()
-                ),
-                new StringSerializer(),
-                new StringSerializer()
-        )) {
-            if (processedMsg != null) {
-                Future<RecordMetadata> response = null;
-                if (Objects.equals(processedMsg.getValue(), "$exit")) {
-                    isExit = true;
-                    return;
-                }
-                response = kafkaProducer.send(new ProducerRecord<>(topicOut, processedMsg.getValue()));
-                Optional.ofNullable(response).ifPresent(rsp -> {
-                    try {
-                        log.info("Message send to out{}", rsp.get());
-                    } catch (InterruptedException | ExecutionException e) {
-                        log.error("Error sending message ", e);
-                        Thread.currentThread().interrupt();
-                    }
-                });
-            }
-
-        }catch (KafkaException e) {
-            log.error("caught kafka exception");
-        }
-
     }
 }

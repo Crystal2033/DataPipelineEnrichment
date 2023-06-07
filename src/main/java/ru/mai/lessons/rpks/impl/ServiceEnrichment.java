@@ -25,7 +25,9 @@ public class ServiceEnrichment implements Service {
         MongoClientImpl mongoClient = new MongoClientImpl(config);
         String reader = config.getString("kafka.consumer.bootstrap.servers");
         String writer = config.getString("kafka.producer.bootstrap.servers");
-        KafkaReaderImpl kafkaReader = new KafkaReaderImpl("test_topic_in", "test_topic_out", reader, writer, rules, config, mongoClient);
+        String topicIn = config.getString("kafka.topicIn");
+        String topicOut = config.getString("kafka.topicOut");
+        KafkaReaderImpl kafkaReader = new KafkaReaderImpl(topicIn, topicOut, reader, writer, rules, config, mongoClient);
         TimerTask task = new TimerTask() {
             public void run() {
                 rules = db.readRulesFromDB();

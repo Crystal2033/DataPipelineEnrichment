@@ -33,8 +33,7 @@ public class RuleProcessorImpl implements RuleProcessor {
         try {
                 for (Rule rule : rules) {
                     //            ПРОВЕРКА ПРАВИЛ
-                    log.info("RULES LENGTH {}", rules.length);
-                    log.info("CHECKING FIELD {}", rule.getFieldName());
+                    log.debug("RULES LENGTH {}", rules.length);
                     mongoClient.mongo(message, rule);
                 }
 
