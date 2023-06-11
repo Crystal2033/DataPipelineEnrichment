@@ -41,7 +41,6 @@ public final class RuleProcessorImpl implements RuleProcessor {
                     Rule rule = entry.getValue();
                     Document doc = mongoClient.getDoc(rule.getFieldNameEnrichment(),rule.getFieldValue());
                     String newValue = getNewValueFromDoc(rule, doc);
-                    log.info("New value: {}", newValue);
 
                     if (Optional.ofNullable(doc).isEmpty())
                         object.addProperty(entry.getKey(), newValue);
