@@ -28,7 +28,6 @@ public class MongoImpl implements MongoDBClientEnricher {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"));
             log.info("Get Collection");
             MongoCollection<Document> documentMongoCollection = mongoDatabase.getCollection(nameCollection);
-            log.info("Collection: {}", documentMongoCollection);
 
             Optional<Document> findDocument = Optional.ofNullable(documentMongoCollection.find(eq(fieldNameEnrichment, fieldValue)).sort(new Document("_id", -1)).first());
             findDocument.ifPresent(doc -> {

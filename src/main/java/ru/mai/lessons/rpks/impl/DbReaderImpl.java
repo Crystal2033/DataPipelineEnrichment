@@ -49,30 +49,18 @@ public class DbReaderImpl implements DbReader {
     }
 
     void createDataSource() {
-        try {
-            String driver = config.getString("db.driver");
-            Class.forName(driver);
-            HikariConfig hikariConfigConfig = createHikariConfig();
-            this.dataSource = new HikariDataSource(hikariConfigConfig);
-            log.info("Created a new datasource");
-        } catch (ClassNotFoundException e) {
-            log.error("Class not found exception (create data source)");
-        }
+        HikariConfig hikariConfigConfig = createHikariConfig();
+        this.dataSource = new HikariDataSource(hikariConfigConfig);
+        log.info("Created a new datasource");
     }
 
     HikariConfig createHikariConfig() {
-        String driver = config.getString("db.driver");
         HikariConfig hikariConfig = new HikariConfig();
-        try {
-            Class.forName(driver);
-            hikariConfig.setJdbcUrl(config.getString("db.jdbcUrl"));
-            hikariConfig.setUsername(config.getString("db.user"));
-            hikariConfig.setPassword(config.getString("db.password"));
-            hikariConfig.setDriverClassName(driver);
-            log.info("Hikari config was done");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        hikariConfig.setJdbcUrl(config.getString("db.jdbcUrl"));
+        hikariConfig.setUsername(config.getString("db.user"));
+        hikariConfig.setPassword(config.getString("db.password"));
+        hikariConfig.setDriverClassName(config.getString("db.driver"));
+        log.info("Hikari config was done");
         return hikariConfig;
     }
 
