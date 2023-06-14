@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    // kafka
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
     // mongodb
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
 
@@ -30,6 +32,7 @@ dependencies {
 
     // json
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
 
     // test
     testImplementation 'org.testcontainers:testcontainers:1.17.6'
