@@ -4,7 +4,6 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import ru.mai.lessons.rpks.DbReader;
 import ru.mai.lessons.rpks.Service;
-import ru.mai.lessons.rpks.ServiceEnrichmentMain;
 import ru.mai.lessons.rpks.model.Rule;
 
 import java.util.Timer;
@@ -17,7 +16,6 @@ public class ServiceEnrichment implements Service {
     Rule[] rules;
     @Override
     public void start(Config config) {
-        log.info("Start proga");
         // написать код реализации сервиса фильтрации
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         int updateIntervalSec = config.getInt("application.updateIntervalSec");
@@ -49,12 +47,9 @@ public class ServiceEnrichment implements Service {
             kafkaReader.processing();
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                task.cancel();
-                timer.cancel();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            task.cancel();
+            timer.cancel();
+        }));
     }
 }

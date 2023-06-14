@@ -47,6 +47,7 @@ public class RuleProcessorImpl implements RuleProcessor {
                 }
             }
         } catch (JsonProcessingException e) {
+            log.error("Error with json");
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

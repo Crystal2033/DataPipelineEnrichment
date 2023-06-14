@@ -18,7 +18,7 @@ public class MongoImpl implements MongoDBClientEnricher {
     @NonNull
     Config config;
 
-    String nameCollection;// = config.getString("mongo.collection");
+    String nameCollection;
 
     public String findDocument(String fieldNameEnrichment, String fieldValue) {
         String documentToReturn;
@@ -26,8 +26,6 @@ public class MongoImpl implements MongoDBClientEnricher {
         try (var mongoClient = MongoClients.create(config.getString("mongo.connectionString"))) {
             log.info("Create and get Database");
             MongoDatabase mongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"));
-//            log.info(nameCollection);
-//            mongoDatabase.createCollection(nameCollection);
             log.info("Get Collection");
             MongoCollection<Document> documentMongoCollection = mongoDatabase.getCollection(nameCollection);
             log.info("Collection: {}", documentMongoCollection);

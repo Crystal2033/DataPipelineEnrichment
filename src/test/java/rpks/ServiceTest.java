@@ -957,10 +957,9 @@ class ServiceTest {
     }
 
     private void sendMessagesToTestTopic(Producer<String, String> producer, Object data) {
-//        log.info("Send message to kafka {}", data);
+        log.info("Send message to kafka {}", data);
         try {
             producer.send(new ProducerRecord<>(TEST_TOPIC_IN, "expected", toJson(data))).get();
-            log.info("Send message to kafka {}", toJson(data));
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error send message to kafka topic", e);
             fail();

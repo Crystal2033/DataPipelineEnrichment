@@ -29,12 +29,12 @@ public class DbReaderImpl implements DbReader {
     @NonNull
     Config config;
 
-    private final String enrichmentId = "enrichment_id";
-    private final String ruleId = "rule_id";
-    private final String fieldName = "field_name";
-    private final String fieldNameEnrichment = "field_name_enrichment";
-    private final String fieldValue = "field_value";
-    private final String fieldValueDefault = "field_value_default";
+    private static final String ENRICHMENT_ID = "enrichment_id";
+    private static final String RULE_ID = "rule_id";
+    private static final String FIELD_NAME = "field_name";
+    private static final String FIELD_NAME_ENRICHMENT = "field_name_enrichment";
+    private static final String FIELD_VALUE = "field_value";
+    private static final String FIELD_VALUE_DEFAULT = "field_value_default";
 
     private Connection getConnection() throws SQLException {
         return getDataSource().getConnection();
@@ -86,18 +86,17 @@ public class DbReaderImpl implements DbReader {
             ArrayList<Rule> rulesFromDb = new ArrayList<>();
             ArrayList<String> namesEnrichment = new ArrayList<>();
 
-            var selectFromDb = dsl.select().from(tableName).orderBy(field(ruleId)).fetch();
+            var selectFromDb = dsl.select().from(tableName).orderBy(field(RULE_ID)).fetch();
 
             selectFromDb.forEach(row -> {
-                Long fieldEnrichmentId = (Long) row.getValue(field(enrichmentId));
-                Long fieldRuleId = (Long) row.getValue(field(ruleId));
-                String fieldFieldName = row.getValue(field(fieldName)).toString();
-                String fieldFieldNameEnrichment = row.getValue(field(fieldNameEnrichment)).toString();
-                String fieldFieldValue = row.getValue(field(fieldValue)).toString();
-                String fieldDefault = row.getValue(field(fieldValueDefault)).toString();
+                Long fieldEnrichmentId = (Long) row.getValue(field(ENRICHMENT_ID));
+                Long fieldRuleId = (Long) row.getValue(field(RULE_ID));
+                String fieldFieldName = row.getValue(field(FIELD_NAME)).toString();
+                String fieldFieldNameEnrichment = row.getValue(field(FIELD_NAME_ENRICHMENT)).toString();
+                String fieldFieldValue = row.getValue(field(FIELD_VALUE)).toString();
+                String fieldDefault = row.getValue(field(FIELD_VALUE_DEFAULT)).toString();
                 Rule rule = new Rule(fieldEnrichmentId, fieldRuleId, fieldFieldName, fieldFieldNameEnrichment, fieldFieldValue, fieldDefault);
                 int indexRule;
-                // добавить проверку поля в которое пишем
                 String checkActualRule = fieldFieldNameEnrichment + ";" + fieldFieldName;
                 if ((indexRule = namesEnrichment.indexOf(checkActualRule)) != -1) {
                     rulesFromDb.set(indexRule, rule);
