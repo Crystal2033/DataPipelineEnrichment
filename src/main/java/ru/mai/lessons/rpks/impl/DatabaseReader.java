@@ -17,9 +17,11 @@ import java.sql.SQLException;
 public class DatabaseReader implements DbReader {
     private HikariDataSource dataSource;
     private final HikariConfig hikariConfig = new HikariConfig();
+    private final long id;
 
-    DatabaseReader(Config config) {
+    DatabaseReader(Config config, long id) {
         setConfig(config);
+        this.id = id;
     }
     public void setConfig(Config config) {
         hikariConfig.setJdbcUrl(config.getString("jdbcUrl"));
@@ -32,7 +34,7 @@ public class DatabaseReader implements DbReader {
     public Rule[] readRulesFromDB() {
         try (Connection connection = dataSource.getConnection()) {
             DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
-            return context.select().from("deduplication_rules").fetch().into(Rule.class).toArray(Rule[]::new);
+            return context.select().from("enrichment_rules").where("enrichment_id = " + id).fetch().into(Rule.class).toArray(Rule[]::new);
         }
         catch (SQLException e) {
             log.info("Something went wrong with DB!");

@@ -13,6 +13,9 @@ dependencies {
     // mongodb
     implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
 
+    // kafka
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
+
     // logging
     implementation 'ch.qos.logback:logback-classic:1.4.5'
 
@@ -30,6 +33,7 @@ dependencies {
 
     // json
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 
     // test
     testImplementation 'org.testcontainers:testcontainers:1.17.6'

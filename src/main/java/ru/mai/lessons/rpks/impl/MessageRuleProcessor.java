@@ -4,62 +4,64 @@ package ru.mai.lessons.rpks.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import ru.mai.lessons.rpks.RuleProcessor;
 import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 @Slf4j
 public class MessageRuleProcessor implements RuleProcessor {
 
-    private final MyRedisClient redisClient;
-    public MessageRuleProcessor(MyRedisClient redisClient) {
-        this.redisClient = redisClient;
+    private final MyMongoDBClientEnricher mongoClient;
 
+    public MessageRuleProcessor(MyMongoDBClientEnricher mongoClient) {
+        this.mongoClient = mongoClient;
+        log.info("MessageRuleProcessor created");
     }
+
     private final ObjectMapper parser = new ObjectMapper();
     @Override
     public Message processing(Message message, Rule[] rules) {
         String value = message.getValue();
-        message.setDeduplicationState(true);
+        log.debug("Message = {}", value);
         if (rules.length == 0) {
             return message;
         }
 
-        rules = Arrays.stream(rules).filter(Rule::getIsActive).toArray(Rule[]::new);
-
-        var fieldNames = Arrays.stream(rules).map(Rule::getFieldName).sorted().toArray(String[]::new);
-        if (fieldNames.length == 0) {
-            return message;
-        }
-
-        var ttl = Arrays.stream(rules).mapToLong(Rule::getTimeToLiveSec).max().orElse(0L);
-
         try {
             JsonNode jsonNode = parser.readTree(value);
-            Map<String, String> keyMap = new HashMap<>();
-            for (var fieldName: fieldNames) {
-                var node = jsonNode.path(fieldName);
-                if (!node.isMissingNode()) {
-                    keyMap.put(fieldName, node.asText());
-                }
-            }
-            if (keyMap.isEmpty()) {
-                message.setDeduplicationState(false);
-                return message;
-            }
 
-            if (!redisClient.containsKey(keyMap)) {
-                redisClient.write(keyMap, keyMap, ttl);
-            }
-            else {
-                message.setDeduplicationState(false);
-            }
-            return message;
+            Arrays.stream(rules)
+                    .collect(Collectors.toMap(Rule::getFieldName, rule -> rule,
+                            (oldR, newR) -> oldR.getRuleId() > newR.getRuleId() ? oldR : newR))
+                    .forEach((fieldName, rule) -> {
+                if (!jsonNode.path(rule.getFieldName()).isMissingNode()) {
+                    Document mongoDoc = mongoClient.read(rule.getFieldNameEnrichment(), rule.getFieldValue());
+                    String fieldValue = rule.getFieldValueDefault();
+                    log.debug("Default value = {}", rule.getFieldValueDefault());
+                    ((ObjectNode) jsonNode).put(rule.getFieldName(), fieldValue);
+
+                    if (Optional.ofNullable(mongoDoc).isPresent()) {
+                        fieldValue = mongoDoc.toJson();
+                        try {
+                            ((ObjectNode) jsonNode).set(rule.getFieldName(), parser.readTree(fieldValue));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                        log.debug("JSON NODE = {}", jsonNode);
+                        message.setValue(jsonNode.toString());
+
+                }
+            });
         }
         catch (JsonProcessingException  e) {
-            message.setDeduplicationState(false);
+            return message;
         }
         return message;
     }
