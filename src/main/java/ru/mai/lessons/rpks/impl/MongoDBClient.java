@@ -11,11 +11,11 @@ import com.mongodb.client.model.Sorts;
 
 public class MongoDBClient implements MongoDBClientEnricher {
 
+    private final MongoClient mongoClient;
     private final MongoCollection<Document> documents;
     public MongoDBClient(Config config) {
-        try (MongoClient mongoClient = MongoClients.create(config.getString("connectionString"))) {
-            documents = mongoClient.getDatabase(config.getString("database")).getCollection(config.getString("collection"));
-        }
+        mongoClient = MongoClients.create(config.getString("connectionString"));
+        documents = mongoClient.getDatabase(config.getString("database")).getCollection(config.getString("collection"));
     }
     @Override
     public Document read(String name, String value){
