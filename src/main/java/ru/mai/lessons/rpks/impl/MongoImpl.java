@@ -24,16 +24,12 @@ public class MongoImpl implements MongoDBClientEnricher {
         String documentToReturn;
         nameCollection = config.getString("mongo.collection");
         try (var mongoClient = MongoClients.create(config.getString("mongo.connectionString"))) {
-            log.info("Create and get Database");
+            log.debug("Create and get Database");
             MongoDatabase mongoDatabase = mongoClient.getDatabase(config.getString("mongo.database"));
-            log.info("Get Collection");
+            log.debug("Get Collection");
             MongoCollection<Document> documentMongoCollection = mongoDatabase.getCollection(nameCollection);
 
             Optional<Document> findDocument = Optional.ofNullable(documentMongoCollection.find(eq(fieldNameEnrichment, fieldValue)).sort(new Document("_id", -1)).first());
-            findDocument.ifPresent(doc -> {
-                log.info("Document was found");
-                doc.toJson();
-            });
             if (findDocument.isPresent()) {
                 documentToReturn = findDocument.get().toJson();
             } else {
