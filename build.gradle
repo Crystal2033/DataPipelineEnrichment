@@ -1,5 +1,20 @@
 plugins {
     id 'java'
+    id 'application'
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+application{
+    mainClass = "ru.mai.lessons.rpks.services.ServiceEnrichmentMain"
 }
 
 group 'ru.mai.lessons.rpks'

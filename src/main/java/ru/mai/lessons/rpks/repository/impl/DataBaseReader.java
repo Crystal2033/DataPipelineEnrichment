@@ -14,6 +14,7 @@ import ru.mai.lessons.rpks.repository.interfaces.DbReader;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static org.jooq.impl.DSL.field;
 
@@ -78,7 +79,7 @@ public class DataBaseReader implements DbReader, AutoCloseable {
 
     @Override
     public void close() {
-        dataSource.close();
+        Optional.ofNullable(dataSource).ifPresent(HikariDataSource::close);
     }
 
     private void initHikariConfig() {
