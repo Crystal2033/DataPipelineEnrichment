@@ -19,12 +19,14 @@ import java.util.ArrayList;
 @Slf4j
 public class MyDbReader implements DbReader {
     private final HikariDataSource ds;
+    private String nameDb;
 
     public MyDbReader(Config config) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setUsername(config.getString("user"));
         hikariConfig.setPassword(config.getString("password"));
         hikariConfig.setJdbcUrl(config.getString("jdbcUrl"));
+        nameDb = config.getString("nameDb");
         ds = new HikariDataSource(hikariConfig);
 
     }
@@ -35,7 +37,7 @@ public class MyDbReader implements DbReader {
         try {
             Connection connection = ds.getConnection();
             DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
-            Result<Record> rules = context.select().from("public.enrichment_rules").orderBy(DSL.param("ruleId")).fetch();
+            Result<Record> rules = context.select().from(nameDb).orderBy(DSL.param("ruleId")).fetch();
             rules.forEach(e -> {
                 Long enricherId = (Long) e.getValue("enrichment_id");
                 Long ruleId = (Long) e.getValue("rule_id");

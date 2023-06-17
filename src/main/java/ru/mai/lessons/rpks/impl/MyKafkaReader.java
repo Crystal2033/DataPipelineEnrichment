@@ -75,7 +75,7 @@ public class MyKafkaReader implements KafkaReader {
             }
             log.info("exit");
         } catch (InterruptException e) {
-            log.info("exit from kafka reader");
+            log.error(e.getMessage());
         }
 
     }

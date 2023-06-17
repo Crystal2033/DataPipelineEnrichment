@@ -11,6 +11,6 @@ public class ServiceEnrichment implements Service {
         // написать код реализации сервиса обогащения
         MyKafkaReader kafkaReader = new MyKafkaReader(config);
         kafkaReader.processing();
-        log.info("exit from ServiceDeduplication.start");
+        log.info("exit from ServiceEnrichment.start");
     }
 }
