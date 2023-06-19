@@ -57,7 +57,7 @@ public class WriterToKafka implements KafkaWriter {
                     processing(message);
                     log.debug("KAFKA_PRODUCER_END_PROCESSING_MASSAGE: "+message.getValue());
                     kafkaProducer.send(new ProducerRecord<>(producerSettings.getTopicOut(), message.getValue()));
-                    log.debug("+++++++++KAFKA_PRODUCER_SEND_MASSAGE: "+message.getValue());
+                    log.debug("KAFKA_PRODUCER_SEND_MASSAGE: "+message.getValue());
                 }
             }
         }

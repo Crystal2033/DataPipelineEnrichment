@@ -41,7 +41,7 @@ public class ReaderFromDB implements DbReader {
                         .ruleId((Long)ruleInformation.get("rule_id"))//rule_id
                         .fieldName((String) ruleInformation.get("field_name"))
                         .fieldValue((String) ruleInformation.get("field_value"))
-                        .fieldValueDefault(((String) ruleInformation.get("field_value_default")).replace("\"",""))
+                        .fieldValueDefault(((String) ruleInformation.get("field_value_default")))
                         .fieldNameEnrichment((String) ruleInformation.get("field_name_enrichment")).build();
                 log.debug("FIND_RULE:"+rules[currentRuleIndex].toString());
                 currentRuleIndex++;

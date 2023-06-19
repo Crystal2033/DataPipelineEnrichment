@@ -30,7 +30,7 @@ public class ProcessorOfRule implements RuleProcessor {
              jsonObject.put(rule.getFieldName(), (new JSONParser().parse(findResult.toJson())));
          }
          else{
-             jsonObject.put(rule.getFieldName(), rule.getFieldValueDefault());
+             jsonObject.put(rule.getFieldName(), rule.getFieldValueDefault().replace("\"",""));
          }
         message.setValue(jsonObject.toString());
     }

@@ -862,13 +862,13 @@ class ServiceTest {
                     )
                     .from(table(tableName))
                     .where(field("enrichment_id").eq(enrichmentId).and(field("rule_id").eq(ruleId)))
-                    .fetch();//"\"default_value\""
+                    .fetch();
 
             String expectedValue =
                     String.format("enrichment_id,rule_id,field_name,field_name_enrichment,field_value,field_value_default\n%d,%d,%s,%s,%s,%s\n",
                             enrichmentId, ruleId, fieldName, fieldNameEnrichment, fieldValue, fieldValueDefault);
 
-           // assertEquals(expectedValue, result.formatCSV());
+            //assertEquals(expectedValue, result.formatCSV());
         } catch (SQLException ex) {
             log.error("Error creating rule", ex);
         }
