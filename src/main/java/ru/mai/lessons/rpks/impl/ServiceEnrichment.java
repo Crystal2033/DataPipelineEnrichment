@@ -20,7 +20,7 @@ public class ServiceEnrichment implements Service {
     @Override
     public void start(Config config) {
         // написать код реализации сервиса обогащения
-        log.info("CONFIG:"+config.toString());
+        log.debug("CONFIG:"+config.toString());
         AtomicBoolean isExit=new AtomicBoolean(false);
         ConcurrentLinkedQueue<Message> concurrentLinkedQueue=new ConcurrentLinkedQueue<>();
         ConcurrentLinkedQueue<Rule[]> rules=new ConcurrentLinkedQueue<>();
@@ -33,7 +33,9 @@ public class ServiceEnrichment implements Service {
         int updateIntervalSec=config.getConfig("application").getInt("updateIntervalSec");
 
 
-        ProcessorOfRule processorOfRule=ProcessorOfRule.builder().build();
+
+        ClientOfMongoDB clientOfMongoDB=ClientOfMongoDB.builder().mongoDBSettings(mongoDBSettings).build();
+        ProcessorOfRule processorOfRule=ProcessorOfRule.builder().clientOfMongoDB(clientOfMongoDB).build();
 
         WriterToKafka writerToKafka= WriterToKafka.builder().producerSettings(producerSettings)
                 .concurrentLinkedQueue(concurrentLinkedQueue).rules(rules)
@@ -44,9 +46,9 @@ public class ServiceEnrichment implements Service {
         executorService.submit(writerToKafka::startWriter);
         executorService.submit(readerFromKafka::processing);
         ReaderFromDB readerFromDB=ReaderFromDB.builder().dbSettings(dbSettings).build();
-        while(!isExit.get()) {
+       while(!isExit.get()) {
             rules.add(readerFromDB.readRulesFromDB());
-            log.info("ADD_RULE");
+            log.debug("ADD_RULE");
             if(rules.size()>1) {
                 rules.poll();
             }
@@ -95,7 +97,8 @@ public class ServiceEnrichment implements Service {
                     .driver(dbConfig.getString("driver"))
                     .user(dbConfig.getString("user"))
                     .password(dbConfig.getString("password"))
-                    .tableName(dbConfig.getString("tableName")).build();
+                    .tableName(dbConfig.getString("tableName"))
+                    .enrichmentId(config.getInt( "application.enrichmentId")).build();
             log.debug("DB_SETTINGS_WAS_READ: " + dbSettings.toString());
             return dbSettings;
         }

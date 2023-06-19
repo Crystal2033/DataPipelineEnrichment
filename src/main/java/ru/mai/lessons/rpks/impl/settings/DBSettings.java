@@ -15,4 +15,5 @@ public class DBSettings {
     private String password;
     private String driver;
     private String tableName;
+    private Integer enrichmentId;
 }

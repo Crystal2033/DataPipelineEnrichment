@@ -30,10 +30,11 @@ public class WriterToKafka implements KafkaWriter {
     @Override
     public void processing(Message message) {
         assert rules.peek() != null;
-
+        try {
             processorOfRule.processing(message,rules.peek());
-
-
+        } catch (ParseException e) {
+            log.warn("PARSE EXCEPTION");
+        }
     }
     void startWriter(){
         log.debug("START_WRITE_MESSAGE_IN_KAFKA_TOPIC {}", producerSettings.getTopicOut());
@@ -49,14 +50,14 @@ public class WriterToKafka implements KafkaWriter {
             while(true){
                 if((!concurrentLinkedQueue.isEmpty())&&!(rules.isEmpty())) {
                     Message message=concurrentLinkedQueue.poll();
-                    log.info("KAFKA_PRODUCER_START_PROCESSING_MASSAGE: "+message.getValue());
+                    log.debug("KAFKA_PRODUCER_START_PROCESSING_MASSAGE: "+message.getValue());
                     if(message.getValue().equals("$exit")) {
                         break;
                     }
                     processing(message);
-                    log.info("KAFKA_PRODUCER_END_PROCESSING_MASSAGE: "+message.getValue());
+                    log.debug("KAFKA_PRODUCER_END_PROCESSING_MASSAGE: "+message.getValue());
                     kafkaProducer.send(new ProducerRecord<>(producerSettings.getTopicOut(), message.getValue()));
-                    log.info("KAFKA_PRODUCER_SEND_MASSAGE: "+message.getValue());
+                    log.debug("+++++++++KAFKA_PRODUCER_SEND_MASSAGE: "+message.getValue());
                 }
             }
         }
