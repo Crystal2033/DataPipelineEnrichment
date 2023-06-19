@@ -712,7 +712,7 @@ class ServiceTest {
             createAndCheckRuleInPostgreSQL(
                     ENRICHMENT_ID,
                     2L,
-                     "enrichmentOtherField",
+                    "enrichmentOtherField",
                     MONGO_TEST_CONDITION_FIELD_DOCUMENT,
                     MONGO_TEST_CONDITION_FIELD_VALUE + "_other",
                     MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);

@@ -38,7 +38,7 @@ public class ReaderFromDB implements DbReader {
             int currentRuleIndex=0;
             for(Record ruleInformation:information){
                 rules[currentRuleIndex]=Rule.builder().enricherId((Long)ruleInformation.get("enrichment_id"))
-                        .ruleId((Long)ruleInformation.get("rule_id"))//rule_id
+                        .ruleId((Long)ruleInformation.get("rule_id"))
                         .fieldName((String) ruleInformation.get("field_name"))
                         .fieldValue((String) ruleInformation.get("field_value"))
                         .fieldValueDefault(((String) ruleInformation.get("field_value_default")))
