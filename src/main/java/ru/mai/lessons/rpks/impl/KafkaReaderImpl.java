@@ -8,7 +8,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import ru.mai.lessons.rpks.DbReader;
 import ru.mai.lessons.rpks.KafkaReader;
-import ru.mai.lessons.rpks.RedisClient;
 import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 
