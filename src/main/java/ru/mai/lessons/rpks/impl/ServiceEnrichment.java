@@ -6,6 +6,7 @@ import ru.mai.lessons.rpks.Service;
 public class ServiceEnrichment implements Service {
     @Override
     public void start(Config config) {
-        // написать код реализации сервиса обогащения
+        var reader = new KafkaReaderImpl(config);
+        reader.processing();
     }
 }
