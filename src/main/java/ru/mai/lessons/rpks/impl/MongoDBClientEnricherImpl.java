@@ -10,7 +10,6 @@ import org.bson.Document;
 import ru.mai.lessons.rpks.MongoDBClientEnricher;
 import ru.mai.lessons.rpks.model.Rule;
 
-import java.util.Objects;
 
 @Data
 @Slf4j
@@ -29,10 +28,12 @@ public class MongoDBClientEnricherImpl implements MongoDBClientEnricher {
             Document document = new Document();
             document.put(rule.getFieldNameEnrichment(), rule.getFieldValue());
 
-            return Objects.requireNonNullElse(
-                    Objects.requireNonNull(collection.find(document).sort(Sorts.descending("_id")).first()).toJson(),
-                    rule.getFieldValueDefault());
 
+            var earliestFile = collection.find(document).sort(Sorts.descending("_id")).first();
+            if (earliestFile == null)
+                return rule.getFieldValueDefault();
+
+            return earliestFile.toJson();
         }
         catch (Exception e){
             log.error(e.toString());
