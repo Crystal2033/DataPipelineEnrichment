@@ -28,12 +28,14 @@ public class KafkaReaderRealization implements KafkaReader {
     private List<Rule> ruleList = new ArrayList<>();
     private KafkaConsumer<String, String> kafkaConsumer;
     private KafkaWriterRealization kafkaWriter = new KafkaWriterRealization();
-    //private KafkaRuleProcessor ruleProcessor = new KafkaRuleProcessor();
+    private EnrichmentRuleProcessor ruleProcessor = new EnrichmentRuleProcessor();
     private Config config;
     @Override
     public void processing() {
         createKafkaConsumer();
         kafkaWriter.createProducer(config);
+
+        ruleProcessor.createMongoClient(config);
 
         // Run DataBase reader
         RulesScheduler rulesScheduler = new RulesScheduler();
@@ -52,12 +54,9 @@ public class KafkaReaderRealization implements KafkaReader {
 
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                 Message curMessage = Message.builder().value(consumerRecord.value()).build();
-//                if (ruleProcessor.processing(curMessage, ruleList.toArray(Rule[]::new)).isFilterState()) {
-//                    log.info("Message " + curMessage.getValue() + " satisfies rules");
-//                    kafkaWriter.processing(curMessage);
-//                } else {
-//                    log.info("Message " + curMessage.getValue() + " does not satisfies current rules");
-//                }
+                curMessage = ruleProcessor.processing(curMessage, ruleList.toArray(Rule[]::new));
+                if (curMessage != null)
+                    kafkaWriter.processing(curMessage);
             }
             }
         }
