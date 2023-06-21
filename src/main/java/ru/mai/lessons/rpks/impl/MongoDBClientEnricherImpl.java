@@ -18,19 +18,10 @@ import java.util.function.Consumer;
 @Data
 @Slf4j
 public class MongoDBClientEnricherImpl implements MongoDBClientEnricher {
-    //MongoDatabase database;
     String collectionName;
     Config config;
     MongoDBClientEnricherImpl(Config appConfig){
         config = appConfig;
-//        try(MongoClient mongoClient = MongoClients.create(config.getString("mongo.connectionString"))) {
-//            collectionName = config.getString("mongo.collection");
-//            database = mongoClient.getDatabase(config.getString("mongo.database"));
-//        }
-//        catch (Exception e){
-//            log.info(e.toString());
-//        }
-
     }
     @Override
     public String getFile(Rule rule) {
