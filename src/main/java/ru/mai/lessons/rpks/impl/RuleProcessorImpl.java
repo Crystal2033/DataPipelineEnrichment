@@ -13,7 +13,6 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class RuleProcessorImpl implements RuleProcessor {
@@ -34,7 +33,7 @@ public class RuleProcessorImpl implements RuleProcessor {
 
             for (var rule : rules) {
                 fieldValue = mongo.getFile(rule);
-                var node = new AbstractMap.SimpleEntry<Long, String>(rule.getRuleId(), fieldValue);
+                var node = new AbstractMap.SimpleEntry<>(rule.getRuleId(), fieldValue);
                 if (ruleList.containsKey(rule.getFieldName())){
                     if (rule.getRuleId() > ruleList.get(rule.getFieldName()).getKey()){
                         ruleList.put(rule.getFieldName(), node);
