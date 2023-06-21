@@ -1,9 +1,11 @@
 package ru.mai.lessons.rpks.impl;
 
+import com.typesafe.config.Config;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import com.typesafe.config.Config;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record6;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import ru.mai.lessons.rpks.DbReader;
 import ru.mai.lessons.rpks.config.DbConfig;
@@ -16,7 +18,10 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.table;
 
 @Slf4j
 @Data
@@ -37,33 +42,37 @@ public class DbReaderImpl implements DbReader {
     @Override
     public Rule[] readRulesFromDB() {
         if (ruleArray == null ||
-                Duration.between(lastCheckTime, Instant.now()).toMillis() > updateIntervalSec) {
+            Duration.between(lastCheckTime, Instant.now()).toMillis() > updateIntervalSec) {
             ruleArray = init();
             lastCheckTime = Instant.now();
         }
         return ruleArray;
     }
 
-    // select * from enrichment_rules where rule_id = (select max(rule_id) from enrichment_rules group by enrichment_id, field_name)
+
+    // select * from enrichment_rules r where rule_id = (select max(rule_id) from enrichment_rules r1
+    // where r.field_name = r1.field_name group by enrichment_id, field_name)
     private Rule[] init() {
         try (Connection connection = dataSource.getConnection()) {
             DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
             String tableName = "enrichment_rules";
             String ruleIdField = "rule_id";
             var result = context.select(
-                            field("enrichment_id"),
-                            field(ruleIdField),
-                            field("field_name"),
-                            field("field_name_enrichment"),
-                            field("field_value"),
-                            field("field_value_default")
-                    )
-                    .from(table(tableName))
-                    .where(field(ruleIdField)
-                            .eq(select(max(field(ruleIdField)))
-                            .from(table(tableName))))
-                            .groupBy(field("enrichment_id"), field("field_name"))
-                    .fetch();
+                    field("enrichment_id"),
+                    field("rule_id"),
+                    field("field_name"),
+                    field("field_name_enrichment"),
+                    field("field_value"),
+                    field("field_value_default")
+                )
+                .from(table(tableName).as("rule"))
+                .where(field(ruleIdField)
+                    .eq(select(max(field(ruleIdField)))
+                        .from(table(tableName).as("rule1"))
+                        .where(field("rule.field_name").eq(field("rule1.field_name")))
+                        .groupBy(field("enrichment_id"), field("field_name")))
+                )
+                .fetch();  //
 
             return result.stream().map((Record6<Object, Object, Object, Object, Object, Object> r) -> {
                 var rule = new Rule();

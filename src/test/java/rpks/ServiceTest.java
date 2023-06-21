@@ -878,7 +878,7 @@ class ServiceTest {
         boolean state = false;
         try {
             while (!state && retry > 0) {
-                ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
                 if (consumerRecords.isEmpty()) {
                     log.info("Remaining attempts {}", retry);
                     retry--;

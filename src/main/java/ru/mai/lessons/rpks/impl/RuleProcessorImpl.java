@@ -2,18 +2,20 @@ package ru.mai.lessons.rpks.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import ru.mai.lessons.rpks.MongoDBClientEnricher;
 import ru.mai.lessons.rpks.RuleProcessor;
 import ru.mai.lessons.rpks.exception.ServerException;
 import ru.mai.lessons.rpks.model.Rule;
 
+import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 @Slf4j
 public class RuleProcessorImpl implements RuleProcessor {
@@ -43,9 +45,18 @@ public class RuleProcessorImpl implements RuleProcessor {
         }
 
 
-        Stream.of(rules).forEach(r ->
-                objectNode.put(r.getFieldName(), mongoDBClientEnricher.read(r.getFieldNameEnrichment(), r.getFieldValue())));
         try {
+            Stream.of(rules).forEach(r -> {
+                objectNode.set(r.getFieldName(),
+                    Optional.ofNullable(mongoDBClientEnricher.read(r.getFieldNameEnrichment(), r.getFieldValue()))
+                        .map(s -> {
+                            try {
+                                return (JsonNode) objectMapper.readValue(s, ObjectNode.class);
+                            } catch (JsonProcessingException e) {
+                                throw new ServerException("Unknown error while serialization");
+                            }
+                        }).orElse(new TextNode(r.getFieldValueDefault())));
+            });
             return objectMapper.writeValueAsString(objectNode);
         } catch (JsonProcessingException e) {
             throw new ServerException("Unknown error while serialization");

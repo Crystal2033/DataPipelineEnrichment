@@ -39,19 +39,15 @@ public class KafkaReaderImpl  implements KafkaReader {
     @Override
     public void processing()
     {
-        while (true) {
-            log.debug("Attempt to read");
-            if (Thread.interrupted()) {
-                break;
-            }
+        while (!Thread.interrupted()) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            log.debug("Got records " + records.count());
             Rule[] rules = dbReader.readRulesFromDB();
+
             StreamSupport.stream(records.spliterator(), false)
-                    .peek(r -> log.debug("Got record {}", r.value()))
-                    .forEach(r -> kafkaWriter.processing(Message.builder()
-                            .value(ruleProcessor.apply(r, rules))
-                            .build()));
+                .peek(r -> log.debug("Got record {}", r.value()))
+                .forEach(r -> kafkaWriter.processing(Message.builder()
+                    .value(ruleProcessor.apply(r, rules))
+                    .build()));
         }
     }
 }

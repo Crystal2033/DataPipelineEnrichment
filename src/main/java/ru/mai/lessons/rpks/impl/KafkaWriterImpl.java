@@ -18,16 +18,17 @@ public class KafkaWriterImpl implements KafkaWriter {
     private final String topicOut;
 
     public KafkaWriterImpl(Config config) {
-        this.kafkaProducer = KafkaConfig.createProducer(config);
         this.topicOut = KafkaConfig.getTopicOut(config);
+        this.kafkaProducer = KafkaConfig.createProducer(config);
+
     }
 
     @SneakyThrows
     @Override
     public void processing(Message message) {
-      /**if (!message.(!message.isDeduplicationState()) {
+        if (message == null) {
             return;
-        }*/
+        }
         log.debug("Sending message " + message.getValue());
         kafkaProducer.send(new ProducerRecord<>(topicOut,
                 UUID.randomUUID().toString(),
