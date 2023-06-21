@@ -394,9 +394,7 @@ class ServiceTest {
             assertEquals(2, consumerRecords.count());
 
             var listExpectedJson = listDataIn.stream().map(data -> {
-                String expectedData = '\"' + MONGO_TEST_DEFAULT_ENRICHMENT_VALUE + '\"';
-                data.setEnrichmentField(expectedData);
-                //data.setEnrichmentField(MONGO_TEST_DEFAULT_ENRICHMENT_VALUE);
+                data.setEnrichmentField("\"" + MONGO_TEST_DEFAULT_ENRICHMENT_VALUE + "\"");
                 return toJsonNode(toJson(data));
             }).toList();
 
