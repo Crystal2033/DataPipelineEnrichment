@@ -54,7 +54,7 @@ public class RuleProcessorImpl implements RuleProcessor {
             return message;
 
         } catch (Exception e){
-            log.info("Json error :{}", e.toString());
+            log.error("Json error :{}", e.toString());
         }
 
         return message;
