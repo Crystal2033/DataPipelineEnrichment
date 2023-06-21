@@ -24,14 +24,15 @@ import static com.mongodb.client.model.Filters.regex;
 @Builder
 public class ClientOfMongoDB implements MongoDBClientEnricher {
     MongoDBSettings mongoDBSettings; //_id -max
-    Document readFromMongoDB(Rule rule){
-        log.debug("RULE"+rule.toString());
+
+    Document readFromMongoDB(Rule rule) {
+        log.debug("RULE" + rule.toString());
         try (var mongoClient = MongoClients.create(mongoDBSettings.getConnectionString())) {
             log.debug("CONNECT_TO_MONGO:");
             MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoDBSettings.getDatabase());
             MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(mongoDBSettings.getCollection());
-            log.debug("COLLECTION: {}",mongoCollection);
-           return mongoCollection.find(new BasicDBObject(rule.getFieldNameEnrichment(), rule.getFieldValue()))
+            log.debug("COLLECTION: {}", mongoCollection);
+            return mongoCollection.find(new BasicDBObject(rule.getFieldNameEnrichment(), rule.getFieldValue()))
                     .sort(new Document("_id", -1)).first();
         }
     }

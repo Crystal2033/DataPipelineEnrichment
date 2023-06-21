@@ -16,22 +16,23 @@ import java.util.Objects;
 @Builder
 public class ProcessorOfRule implements RuleProcessor {
     ClientOfMongoDB clientOfMongoDB;
+
     @Override
     public Message processing(Message message, Rule[] rules) throws ParseException {
-        for(Rule rule:rules ) {
-            setRules(message,rule);
+        for (Rule rule : rules) {
+            setRules(message, rule);
         }
-        return  message;
+        return message;
     }
-    void setRules(Message message,Rule rule) throws ParseException {
+
+    void setRules(Message message, Rule rule) throws ParseException {
         JSONObject jsonObject = (JSONObject) (new JSONParser().parse(message.getValue()));
-         Document findResult=clientOfMongoDB.readFromMongoDB(rule);
-         if(Objects.nonNull(findResult)){
-             jsonObject.put(rule.getFieldName(), (new JSONParser().parse(findResult.toJson())));
-         }
-         else{
-             jsonObject.put(rule.getFieldName(), rule.getFieldValueDefault().replace("\"",""));
-         }
+        Document findResult = clientOfMongoDB.readFromMongoDB(rule);
+        if (Objects.nonNull(findResult)) {
+            jsonObject.put(rule.getFieldName(), (new JSONParser().parse(findResult.toJson())));
+        } else {
+            jsonObject.put(rule.getFieldName(), rule.getFieldValueDefault().replace("\"", ""));
+        }
         message.setValue(jsonObject.toString());
     }
 

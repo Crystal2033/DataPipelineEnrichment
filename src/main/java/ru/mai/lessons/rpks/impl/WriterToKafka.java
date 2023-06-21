@@ -24,21 +24,27 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Builder
 public class WriterToKafka implements KafkaWriter {
     ProducerSettings producerSettings;
-    ConcurrentLinkedQueue<Message> concurrentLinkedQueue;
     ConcurrentLinkedQueue<Rule[]> rules;
     ProcessorOfRule processorOfRule;
+    KafkaProducer<String, String> kafkaProducer;
+
     @Override
     public void processing(Message message) {
-        assert rules.peek() != null;
+        assert kafkaProducer != null;
         try {
-            processorOfRule.processing(message,rules.peek());
+            while (rules.isEmpty()) {
+                log.debug("EMPTY_RULES");
+            }
+            processorOfRule.processing(message, rules.peek());
+            kafkaProducer.send(new ProducerRecord<>(producerSettings.getTopicOut(), message.getValue()));
         } catch (ParseException e) {
-            log.warn("PARSE EXCEPTION");
+            log.warn("NOT_CORRECT_MASSAGE:" + message.getValue());
         }
     }
-    void startWriter(){
-        log.debug("START_WRITE_MESSAGE_IN_KAFKA_TOPIC {}", producerSettings.getTopicOut());
-        KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(
+
+    void createKafkaProducer() {
+        assert producerSettings != null;
+        kafkaProducer = new KafkaProducer<>(
                 Map.of(
                         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, producerSettings.getBootstrapServers(),
                         ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString()
@@ -46,20 +52,6 @@ public class WriterToKafka implements KafkaWriter {
                 new StringSerializer(),
                 new StringSerializer()
         );
-        try (kafkaProducer){
-            while(true){
-                if((!concurrentLinkedQueue.isEmpty())&&!(rules.isEmpty())) {
-                    Message message=concurrentLinkedQueue.poll();
-                    log.debug("KAFKA_PRODUCER_START_PROCESSING_MASSAGE: "+message.getValue());
-                    if(message.getValue().equals("$exit")) {
-                        break;
-                    }
-                    processing(message);
-                    log.debug("KAFKA_PRODUCER_END_PROCESSING_MASSAGE: "+message.getValue());
-                    kafkaProducer.send(new ProducerRecord<>(producerSettings.getTopicOut(), message.getValue()));
-                    log.debug("KAFKA_PRODUCER_SEND_MASSAGE: "+message.getValue());
-                }
-            }
-        }
     }
 }
+
