@@ -97,7 +97,7 @@ class ServiceTest {
     private static final String MONGO_TEST_DB = "enrichment_db";
     private static final String MONGO_TEST_COLLECTION = "enrichment_collection";
     private static final String MONGO_TEST_CONDITION_FIELD_DOCUMENT = "condition_field_in_mongo";
-    private static final String MONGO_TEST_DEFAULT_ENRICHMENT_VALUE = "\"default_value\"";
+    private static final String MONGO_TEST_DEFAULT_ENRICHMENT_VALUE = "default_value";
 
     private static final String MONGO_TEST_CONDITION_FIELD_VALUE = "condition_value";
 
