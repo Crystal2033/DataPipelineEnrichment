@@ -58,8 +58,9 @@ public class KafkaReaderImpl implements KafkaReader {
         config.put("group.id", appConfig.getString("kafka.consumer.group.id"));
         config.put("auto.offset.reset", appConfig.getString("kafka.consumer.auto.offset.reset"));
 
+        var mongoDBClientEnricher = new MongoDBClientEnricherImpl(appConfig);
+        var ruleProcessor = new RuleProcessorImpl(mongoDBClientEnricher);
 
-        var ruleProcessor = new RuleProcessorImpl();
         try(KafkaConsumer<String, String> consumer = new KafkaConsumer<>(config)) {
             var producer = new KafkaWriterImpl(appConfig);
             log.info("connect to topic {}", appConfig.getString("kafka.consumer.topic"));

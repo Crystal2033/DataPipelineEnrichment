@@ -2,11 +2,15 @@ package ru.mai.lessons.rpks.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import ru.mai.lessons.rpks.MongoDBClientEnricher;
 import ru.mai.lessons.rpks.RuleProcessor;
 import ru.mai.lessons.rpks.model.Message;
 import ru.mai.lessons.rpks.model.Rule;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -14,43 +18,38 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RuleProcessorImpl implements RuleProcessor {
     ObjectMapper mapper = new ObjectMapper();
+    MongoDBClientEnricher mongo;
+
+    RuleProcessorImpl(MongoDBClientEnricher mongoDBClientEnricher){
+        mongo = mongoDBClientEnricher;
+    }
 
     @Override
     public Message processing(Message message, Rule[] rules) {
 
         try {
-            SortedMap<String, String> ruleList = new TreeMap<>();
+            SortedMap<String, Map.Entry<Long, String>> ruleList = new TreeMap<>();
             JsonNode jsonNode = mapper.readTree(message.getValue());
+            String fieldValue;
+
             for (var rule : rules) {
-                JsonNode temp = jsonNode.get(rule.getFieldName());
-                if (temp == null)
-                {
-                    return message;
+                fieldValue = mongo.getFile(rule);
+                var node = new AbstractMap.SimpleEntry<Long, String>(rule.getRuleId(), fieldValue);
+                if (ruleList.containsKey(rule.getFieldName())){
+                    if (rule.getRuleId() > ruleList.get(rule.getFieldName()).getKey()){
+                        ruleList.put(rule.getFieldName(), node);
+                    }
                 }
-
-                if (!temp.isValueNode())
-                {
-                    return message;
+                else {
+                    ruleList.put(rule.getFieldName(), node);
                 }
-
-                String value = jsonNode.get(rule.getFieldName()).asText();
-                if (value == null)
-                {
-                    return message;
-                }
-                if (value.isEmpty())
-                {
-                    return message;
-                }
-
-                ruleList.put(rule.getFieldName(), value);
             }
 
-            String joinedList = ruleList.entrySet()
-                    .stream()
-                    .map(el -> el.getKey() + el.getValue())
-                    .collect(Collectors.joining("*", "{", "}"));
+            for (var el: ruleList.entrySet()){
+                ((ObjectNode)jsonNode).set(el.getKey(), mapper.readTree(el.getValue().getValue()));
+            }
 
+            message.setValue(jsonNode.toString());
 
             return message;
 

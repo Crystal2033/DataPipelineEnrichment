@@ -1,5 +1,7 @@
 package ru.mai.lessons.rpks;
 
+import ru.mai.lessons.rpks.model.Rule;
+
 public interface MongoDBClientEnricher {
-    String getFile(String file);
+    String getFile(Rule rule);
 }
