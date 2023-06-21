@@ -35,7 +35,7 @@ public class MongoDBClientEnricherImpl implements MongoDBClientEnricher {
 
         }
         catch (Exception e){
-            log.info(e.toString());
+            log.error(e.toString());
         }
         return null;
     }
