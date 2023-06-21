@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import ru.mai.lessons.rpks.MongoDBClientEnricher;
 import ru.mai.lessons.rpks.model.Rule;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @Data
@@ -52,10 +53,8 @@ public class MongoDBClientEnricherImpl implements MongoDBClientEnricher {
                     field = cl.toJson();
             }
 
-            if (field == null)
-                return rule.getFieldValueDefault();
+            return Objects.requireNonNullElse(field, rule.getFieldValueDefault());
 
-            return field;
         }
         catch (Exception e){
             log.info(e.toString());

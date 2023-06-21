@@ -45,6 +45,7 @@ public class RuleProcessorImpl implements RuleProcessor {
                 }
             }
 
+
             for (var el: ruleList.entrySet()){
                 ((ObjectNode)jsonNode).set(el.getKey(), mapper.readTree(el.getValue().getValue()));
             }
