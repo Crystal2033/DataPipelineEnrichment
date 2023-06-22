@@ -48,6 +48,7 @@ public class KafkaReaderRealization implements KafkaReader {
         log.info("Start consumer cycle");
         while (true) {
             ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofMillis(500));
+            ruleList = rulesScheduler.getRules();
 
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                 Message curMessage = Message.builder().value(consumerRecord.value()).build();
