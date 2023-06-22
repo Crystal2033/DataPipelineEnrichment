@@ -49,11 +49,11 @@ public class EnrichmentRuleProcessor implements RuleProcessor {
             log.debug("message has been enriched");
             return message;
         } catch (
-        JsonProcessingException e) {
+                JsonProcessingException e) {
             log.error("Message {} have uncorrected data", message.getValue());
             log.error("JSON Error" + e.getMessage());
             return null;
-    }
+        }
     }
 
     public void createMongoClient(Config config) {

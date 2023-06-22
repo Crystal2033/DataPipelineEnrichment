@@ -4,7 +4,6 @@ import com.typesafe.config.Config;
 import ru.mai.lessons.rpks.Service;
 
 public class ServiceEnrichment implements Service {
-
     private KafkaReaderRealization kafkaReader = new KafkaReaderRealization();
     @Override
     public void start(Config config) {
