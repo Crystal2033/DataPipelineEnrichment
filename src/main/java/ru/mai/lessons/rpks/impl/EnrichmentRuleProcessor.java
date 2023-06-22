@@ -36,7 +36,7 @@ public class EnrichmentRuleProcessor implements RuleProcessor {
                 else {
                     nonJsonMap.put(rule.getFieldName(),rule.getFieldValueDefault());
                 }
-                log.info("message " + message.getValue() + " get new value in " + rule.getFieldName() + " =" + map.get(rule.getFieldName()));
+                log.debug("message " + message.getValue() + " get new value in " + rule.getFieldName() + " =" + map.get(rule.getFieldName()));
             }
 
             JsonNode newMessage = mapper.readTree(mapper.writeValueAsString(map));
@@ -46,11 +46,11 @@ public class EnrichmentRuleProcessor implements RuleProcessor {
             }
             message.setValue(newMessage.toString());
 
-            log.info("message has been enriched");
+            log.debug("message has been enriched");
             return message;
         } catch (
         JsonProcessingException e) {
-            log.info("Message {} have uncorrected data", message.getValue());
+            log.error("Message {} have uncorrected data", message.getValue());
             log.error("JSON Error" + e.getMessage());
             return null;
     }

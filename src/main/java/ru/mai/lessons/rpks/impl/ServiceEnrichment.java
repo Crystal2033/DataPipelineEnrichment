@@ -9,8 +9,6 @@ public class ServiceEnrichment implements Service {
     private KafkaReaderRealization kafkaReader = new KafkaReaderRealization();
     @Override
     public void start(Config config) {
-
-
         // написать код реализации сервиса фильтрации
         kafkaReader.setConfig(config);
         kafkaReader.processing();

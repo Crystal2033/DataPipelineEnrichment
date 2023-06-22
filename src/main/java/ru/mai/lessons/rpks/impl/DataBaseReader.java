@@ -52,12 +52,11 @@ public class DataBaseReader implements DbReader {
     }
 
     public boolean isConnected() throws SQLException {
-        return getConnection().isValid(0);
-    }
-
-    public void close(){
-        log.info("Close connection");
-        if (hikariDataSource != null)
-            hikariDataSource.close();
+        if (getConnection() == null) {
+            return false;
+        }
+        else {
+            return getConnection().isValid(0);
+        }
     }
 }
